@@ -37,13 +37,13 @@ def getpost(post_id):
 
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
-        'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad FROM post WHERE id = "' + str(
+        'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad,name,type FROM post WHERE id = "' + str(
             post_id) + '"')
     if cursor.rowcount == 0 or cursor.rowcount > 1:
         raise ValueError
     row = cursor.fetchall()[0]
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
-            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'id': post_id}
+            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': row[9].upper(), 'num_comments': 0, 'id': post_id}
     mariadb_connection.close()
     return render_template('post.html', post=post)
 
@@ -52,8 +52,8 @@ def getpost(post_id):
 def update():
     # Read form from request
     cat = request.form["category"]
-    succ = int('success' in request.form)
-    # succ = int(succ is True)
+    succ = request.form['success']
+    sentiment = request.form['sentiment']
     id = request.form["post_id"]
 
     # Build statements

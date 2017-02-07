@@ -13,6 +13,20 @@
     <div class="header">
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
+    <div class="row">
+        <div class="col col-lg-8">
+            {% if post.name is not none %}
+                <p>{{ post.name }}</p>
+            {%endif %}
+        </div>
+        <div class="col col-lg-4">
+            <span class="pull-right"><p> Type:
+                {% if post.type is not none %}
+                    <strong>{{ post.type }}</strong>
+                {%endif %}
+            </p></span>
+        </div>
+    </div>
     <div class="jumbotron">
         <p>{{ post.text }}</p>
     </div>
@@ -49,6 +63,8 @@
         <tr>
             <th>Anzahl Shares</th>
             <td>{{ post.num_shares }}</td>
+            <th>Anzahl Comments</th>
+            <td>{{ post.num_comments }}</td>
         </tr>
         </tbody>
     </table>
@@ -70,22 +86,27 @@
                 <div class="form-group row">
                     <div class="col col-lg-6">
                         <label for="success">Erfolgreich</label>
-                        <select class="form-control" name="success">
-                            <option>Erfolgreiche Beitrag</option>
-                            <option>Nicht Erfolgreiche Beitrag</option>
-                        </select>
+                        <div class="btn-group btn-group-justified" data-toggle="buttons">
+                            <label class="btn btn-success">
+                                <input type="radio" name="success" id="succesful" value="1" autocomplete="off"> Erfolgreich
+                            </label>
+                            <label class="btn btn-danger">
+                                <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off" checked> Nicht
+                                Erfolgreich
+                            </label>
+                        </div>
                     </div>
                     <div class="col col-lg-6">
                         <label for="sentiment">Sentiment </label>
                         <div class="btn-group btn-group-justified" data-toggle="buttons">
                             <label class="btn btn-success">
-                                <input type="radio" name="sentiment" id="positive" autocomplete="off"> Positive
+                                <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off"> Positive
                             </label>
                             <label class="btn btn-warning active">
-                                <input type="radio" name="sentiment" id="neutral" autocomplete="off" checked> Neutral
+                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off" checked> Neutral
                             </label>
                             <label class="btn btn-danger">
-                                <input type="radio" name="sentiment" id="negative" autocomplete="off"> Negative
+                                <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off"> Negative
                             </label>
                         </div>
                     </div>
