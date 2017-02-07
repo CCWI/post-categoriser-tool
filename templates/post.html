@@ -4,60 +4,62 @@
 <head>
     <title>Categoriser Tool</title>
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/stylesheet.css') }}" rel="stylesheet">
 </head>
 
 <body>
 
 <div class="container">
-    <div class="header">
+    <div class="header bottom-buffer">
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
-    <div class="row">
-        <div class="col col-xs-8">
-            {% if post.name is not none %}
-                <a href="{{ post.perm_link }}"><p>{{ post.name }}</p></a>
-            {% endif %}
-        </div>
-        <div class="col col-xs-4">
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <div class="row panel-title">
+                <div class="col col-xs-8">
+                    {% if post.name is not none %}
+                        <a style="color: white" href="{{ post.perm_link }}"><p>{{ post.name }}</p></a>
+                    {% endif %}
+                </div>
+                <div class="col col-xs-4">
             <span class="pull-right"><p> Type:
                 {% if post.type is not none %}
                     <strong>{{ post.type }}</strong>
                 {% endif %}
             </p></span>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="jumbotron">
-        <div class="row">
-            {% if post.type == 'PHOTO' and post.picture is not none %}
-                <div class="col col-xs-4">
-                    <div class="limit">
-                        <img src="{{ post.picture }}">
+        <div class="panel-body">
+            <div class="row">
+                {% if post.type == 'PHOTO' and post.picture is not none %}
+                    <div class="col col-sm-4 bottom-buffer ">
+                        <img width = "100%" src="{{ post.picture }}">
                     </div>
-                </div>
-                <div class="col col-xs-8">
-                    <p>{{ post.text }}</p>
-                </div>
-            {% elif post.type == "VIDEO" and post.source is not none %}
-                <div class="row">
-                    <div class="col col-xs-12 bottom-buffer">
-                        <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ post.source }}"></iframe>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col col-xs-12">
+                    <div class="col col-sm-8">
                         <p>{{ post.text }}</p>
                     </div>
-                </div>
+                {% elif post.type == "VIDEO" and post.source is not none %}
+                    <div class="row">
+                        <div class="col col-xs-12 bottom-buffer">
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item" src="{{ post.source }}"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col col-xs-12">
+                            <p>{{ post.text }}</p>
+                        </div>
+                    </div>
 
-            {% else %}
-                <div class="col col-md-12">
-                    <p>{{ post.text }}</p>
-                </div>
-            {% endif %}
+                {% else %}
+                    <div class="col col-md-12">
+                        <p>{{ post.text }}</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -65,32 +67,32 @@
     <table class="table">
         <tbody>
         <tr>
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/like.png') }}" alt="like"
-                            height="25"></th>
+            <th>Anzahl Likes <img src="{{ url_for('static', filename='images/emotions/like.png') }}" alt="like"
+                                  height="25"></th>
             <td>{{ post.num_likes }}</td>
 
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/love.png') }}" alt="like"
-                            height="25"></th>
+            <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}" alt="like"
+                                 height="25"></th>
             <td>{{ post.num_love }}</td>
         </tr>
         <tr>
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/haha.png') }}" alt="like"
-                            height="25"></th>
+            <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}" alt="like"
+                                 height="25"></th>
             <td>{{ post.num_haha }}</td>
 
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
-                            height="25"
+            <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
+                                height="25"
             ></th>
             <td>{{ post.num_wow }}</td>
         </tr>
         <tr>
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
-                            height="25"
+            <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
+                                height="25"
             ></th>
             <td>{{ post.num_sad }}</td>
 
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/angry.png') }}" alt="like"
-                            height="25"></th>
+            <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}" alt="like"
+                                  height="25"></th>
             <td>{{ post.num_angry }}</td>
         </tr>
         <tr>
