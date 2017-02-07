@@ -1,7 +1,10 @@
+import os
 import random
 
 from flask import Flask, render_template
 import mysql.connector as mariadb
+from flask import redirect
+from flask import url_for
 
 from config import db_host, db_port, db_user, db_password, db_name
 
@@ -17,7 +20,6 @@ def main():
 def generate():
     mariadb_connection = mariadb.connect(host=db_host, port=db_port, user=db_user, password=db_password,
                                          database=db_name)
-
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute('SELECT id FROM post WHERE category IS NULL')
     rows = cursor.fetchall()
@@ -25,10 +27,11 @@ def generate():
     if cursor.rowcount == 0:
         return render_template('alldone.html')
     else:
-        id = random.choice(rows)[0]
-        return getbeitrag(id)
+        post_id = random.choice(rows)[0]
+        #return getbeitrag(post_id)
+        return redirect(url_for('getbeitrag', beitrag_id=post_id))
 
-app.jinja_env.globals.update(generate=generate)
+
 
 @app.route('/beitrag/<beitrag_id>')
 def getbeitrag(beitrag_id):
@@ -44,6 +47,11 @@ def getbeitrag(beitrag_id):
     mariadb_connection.close()
     return render_template('beitrag.html', beitrag=beitrag)
 
+@app.route('/update', methods=['POST'])
+def update():
+    print('update record')
+    return generate()
 
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
