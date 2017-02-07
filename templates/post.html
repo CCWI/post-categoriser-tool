@@ -5,6 +5,7 @@
     <title>Categoriser Tool</title>
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/stylesheet.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -14,22 +15,52 @@
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
     <div class="row">
-        <div class="col col-lg-8">
+        <div class="col col-xs-8">
             {% if post.name is not none %}
-                <p>{{ post.name }}</p>
-            {%endif %}
+                <a href="{{ post.perm_link }}"><p>{{ post.name }}</p></a>
+            {% endif %}
         </div>
-        <div class="col col-lg-4">
+        <div class="col col-xs-4">
             <span class="pull-right"><p> Type:
                 {% if post.type is not none %}
                     <strong>{{ post.type }}</strong>
-                {%endif %}
+                {% endif %}
             </p></span>
         </div>
     </div>
     <div class="jumbotron">
-        <p>{{ post.text }}</p>
+        <div class="row">
+            {% if post.type == 'PHOTO' and post.picture is not none %}
+                <div class="col col-xs-4">
+                    <div class="limit">
+                        <img src="{{ post.picture }}">
+                    </div>
+                </div>
+                <div class="col col-xs-8">
+                    <p>{{ post.text }}</p>
+                </div>
+            {% elif post.type == "VIDEO" and post.source is not none %}
+                <div class="row">
+                    <div class="col col-xs-12 bottom-buffer">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src="{{ post.source }}"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-xs-12">
+                        <p>{{ post.text }}</p>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="col col-md-12">
+                    <p>{{ post.text }}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
+
 
     <table class="table">
         <tbody>
@@ -47,12 +78,14 @@
                             height="25"></th>
             <td>{{ post.num_haha }}</td>
 
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like" height="25"
+            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
+                            height="25"
             ></th>
             <td>{{ post.num_wow }}</td>
         </tr>
         <tr>
-            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like" height="25"
+            <th>Anzahl <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
+                            height="25"
             ></th>
             <td>{{ post.num_sad }}</td>
 
@@ -69,6 +102,7 @@
         </tbody>
     </table>
 
+
     <div class="panel panel-default">
         <div class="panel-body">
             <form action="{{ url_for('update') }}" method="POST">
@@ -84,34 +118,41 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col col-lg-6">
+                    <div class="col col-sm-6">
                         <label for="success">Erfolgreich</label>
                         <div class="btn-group btn-group-justified" data-toggle="buttons">
                             <label class="btn btn-success">
-                                <input type="radio" name="success" id="succesful" value="1" autocomplete="off"> Erfolgreich
+                                <input type="radio" name="success" id="succesful" value="1" autocomplete="off">
+                                Erfolgreich
                             </label>
                             <label class="btn btn-danger">
-                                <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off" checked> Nicht
+                                <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off"
+                                       checked> Nicht
                                 Erfolgreich
                             </label>
                         </div>
                     </div>
-                    <div class="col col-lg-6">
+                    <div class="col col-sm-6">
                         <label for="sentiment">Sentiment </label>
                         <div class="btn-group btn-group-justified" data-toggle="buttons">
                             <label class="btn btn-success">
-                                <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off"> Positive
+                                <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off">
+                                Positive
                             </label>
                             <label class="btn btn-warning active">
-                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off" checked> Neutral
+                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off"
+                                       checked> Neutral
                             </label>
                             <label class="btn btn-danger">
-                                <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off"> Negative
+                                <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off">
+                                Negative
                             </label>
                         </div>
                     </div>
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-block">Aktualisieren</button>
+
             </form>
         </div>
     </div>
