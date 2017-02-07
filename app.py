@@ -4,6 +4,7 @@ import random
 from flask import Flask, render_template
 import mysql.connector as mariadb
 from flask import redirect
+from flask import request
 from flask import url_for
 
 from config import db_host, db_port, db_user, db_password, db_name
@@ -18,8 +19,7 @@ def main():
 
 @app.route('/generate')
 def generate():
-    mariadb_connection = mariadb.connect(host=db_host, port=db_port, user=db_user, password=db_password,
-                                         database=db_name)
+    mariadb_connection = get_db_connection()
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute('SELECT id FROM post WHERE category IS NULL')
     rows = cursor.fetchall()
@@ -28,29 +28,53 @@ def generate():
         return render_template('alldone.html')
     else:
         post_id = random.choice(rows)[0]
-        #return getbeitrag(post_id)
-        return redirect(url_for('getbeitrag', beitrag_id=post_id))
+        return redirect(url_for('getpost', post_id=post_id))
 
 
-
-@app.route('/beitrag/<beitrag_id>')
-def getbeitrag(beitrag_id):
-    mariadb_connection = mariadb.connect(host=db_host, port=db_port, user=db_user, password=db_password,
-                                         database=db_name)
+@app.route('/post/<post_id>')
+def getpost(post_id):
+    mariadb_connection = get_db_connection()
 
     cursor = mariadb_connection.cursor(buffered=True)
-    cursor.execute('SELECT text,num_likes,num_shares FROM post WHERE id = "' + str(beitrag_id) + '"')
+    cursor.execute('SELECT text,num_likes,num_shares FROM post WHERE id = "' + str(post_id) + '"')
     if cursor.rowcount == 0 or cursor.rowcount > 1:
         raise ValueError
     row = cursor.fetchall()[0]
-    beitrag = {'text': row[0], 'anzahl_likes': row[1], 'anzahl_shares': row[2]}
+    post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'id': post_id}
     mariadb_connection.close()
-    return render_template('beitrag.html', beitrag=beitrag)
+    return render_template('post.html', post=post)
+
 
 @app.route('/update', methods=['POST'])
 def update():
-    print('update record')
+    # Read form from request
+    cat = request.form["category"]
+    succ = int('success' in request.form)
+    #succ = int(succ is True)
+    id = request.form["post_id"]
+
+    # Build statements
+    stmt = 'UPDATE post SET category = "' + cat + '" WHERE id = "' + id + '"'
+    stmt2 = 'UPDATE post SET successful = ' + str(succ) + ' WHERE id = "' + id + '"'
+
+    # Update Record in Database
+    print('Updating record ' + str(id))
+    connection = get_db_connection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(stmt)
+    cursor.execute(stmt2)
+    connection.commit()
+    connection.close()
+
+    # Return to generate page for a new post
     return generate()
+
+
+# Private getter to create a connection object
+def get_db_connection():
+    return mariadb.connect(host=db_host, port=db_port, user=db_user, password=db_password,
+                           database=db_name)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

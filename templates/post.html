@@ -14,7 +14,7 @@
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
     <div class="jumbotron">
-        <p>{{ beitrag.text }}</p>
+        <p>{{ post.text }}</p>
     </div>
 
     <div>
@@ -22,23 +22,23 @@
             <tbody>
             <tr>
                 <th>Anzahl Likes</th>
-                <td>{{ beitrag.anzahl_likes }}</td>
+                <td>{{ post.num_likes }}</td>
             </tr>
             <tr>
                 <th>Anzahl Shares</th>
-                <td>{{ beitrag.anzahl_shares }}</td>
+                <td>{{ post.num_shares }}</td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-
-            <form action="/update" method="POST">
+            <form action="{{ url_for('update') }}" method="POST">
+                <input type="hidden" name="post_id" value="{{ post.id }}">
                 <div class="form-group row">
                     <div class="col col-lg-6">
-                        <label for="cat_select">Cateogry</label>
-                        <select class="form-control" id="cat_select">
+                        <label for="category">Cateogry</label>
+                        <select class="form-control" name="category">
                             <option>Produkt Werbung</option>
                             <option>Besondere Aktion (Rabatt)</option>
                             <option>Anderes Thema</option>
@@ -48,7 +48,7 @@
                 <div class="form-group row">
                     <div class="col col-lg-6">
                         <div class="checkbox">
-                            <label><input type="checkbox" value="">Erfolgreich</label>
+                            <label><input type="checkbox" name="success" value="">Erfolgreich</label>
                         </div>
                     </div>
                 </div>
