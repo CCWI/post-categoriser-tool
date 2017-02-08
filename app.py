@@ -52,7 +52,8 @@ def getpost(post_id):
     post['comments'] = []
     comments = cursor.fetchall()
     for comment in comments:
-        post['comments'].append(comment[0])
+        if comment[0].strip() != "":
+            post['comments'].append(comment[0])
 
     post['num_comments'] = len(post['comments'])
     # close database connection
@@ -95,4 +96,4 @@ def get_db_connection():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port) #NOSONAR
