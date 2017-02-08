@@ -33,8 +33,10 @@ def generate():
 
 @app.route('/post/<post_id>')
 def getpost(post_id):
+    # open database connection
     mariadb_connection = get_db_connection()
 
+    # get post info from the database
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
         'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad,name,type, picture,source,permanent_link FROM post WHERE id = "' + str(
@@ -44,8 +46,19 @@ def getpost(post_id):
     row = cursor.fetchall()[0]
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': row[9].upper(),
-            'picture': row[10],'source': row[11], 'perm_link': row[12], 'num_comments': 0, 'id': post_id}
+            'picture': row[10], 'source': row[11], 'perm_link': row[12], 'id': post_id}
+    cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
+    # add comments
+    post['comments'] = []
+    comments = cursor.fetchall()
+    for comment in comments:
+        post['comments'].append(comment[0])
+
+    post['num_comments'] = len(post['comments'])
+    # close database connection
     mariadb_connection.close()
+
+    # retrun post page
     return render_template('post.html', post=post)
 
 

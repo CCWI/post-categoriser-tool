@@ -14,95 +14,111 @@
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
 
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <div class="row panel-title">
-                <div class="col col-xs-8">
-                    {% if post.name is not none %}
-                        <a style="color: white" href="{{ post.perm_link }}"><p>{{ post.name }}</p></a>
-                    {% endif %}
-                </div>
-                <div class="col col-xs-4">
+    <div class="row">
+        <div class="col col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row panel-title">
+                        <div class="col col-xs-8">
+                            {% if post.name is not none %}
+                                <a style="color:white;" href="{{ post.perm_link }}"><p>{{ post.name }}</p></a>
+                            {% endif %}
+                        </div>
+                        <div class="col col-xs-4">
             <span class="pull-right"><p> Type:
                 {% if post.type is not none %}
                     <strong>{{ post.type }}</strong>
                 {% endif %}
             </p></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {% if post.type == 'PHOTO' and post.picture is not none %}
+                            <div class="col col-sm-4 bottom-buffer ">
+                                <img width="100%" src="{{ post.picture }}">
+                            </div>
+                            <div class="col col-sm-8">
+                                <p>{{ post.text }}</p>
+                            </div>
+                        {% elif post.type == "VIDEO" and post.source is not none %}
+                            <div class="row">
+                                <div class="col col-xs-12 bottom-buffer">
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <iframe class="embed-responsive-item" src="{{ post.source }}"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-xs-12">
+                                    <p>{{ post.text }}</p>
+                                </div>
+                            </div>
+
+                        {% else %}
+                            <div class="col col-md-12">
+                                <p>{{ post.text }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                {% if post.type == 'PHOTO' and post.picture is not none %}
-                    <div class="col col-sm-4 bottom-buffer ">
-                        <img width = "100%" src="{{ post.picture }}">
-                    </div>
-                    <div class="col col-sm-8">
-                        <p>{{ post.text }}</p>
-                    </div>
-                {% elif post.type == "VIDEO" and post.source is not none %}
-                    <div class="row">
-                        <div class="col col-xs-12 bottom-buffer">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="embed-responsive-item" src="{{ post.source }}"></iframe>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col col-xs-12">
-                            <p>{{ post.text }}</p>
-                        </div>
-                    </div>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Anzahl Likes <img src="{{ url_for('static', filename='images/emotions/like.png') }}" alt="like"
+                                          height="25"></th>
+                    <td>{{ post.num_likes }}</td>
 
-                {% else %}
-                    <div class="col col-md-12">
-                        <p>{{ post.text }}</p>
-                    </div>
-                {% endif %}
+                    <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}" alt="like"
+                                         height="25"></th>
+                    <td>{{ post.num_love }}</td>
+                </tr>
+                <tr>
+                    <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}" alt="like"
+                                         height="25"></th>
+                    <td>{{ post.num_haha }}</td>
+
+                    <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
+                                        height="25"
+                    ></th>
+                    <td>{{ post.num_wow }}</td>
+                </tr>
+                <tr>
+                    <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
+                                        height="25"
+                    ></th>
+                    <td>{{ post.num_sad }}</td>
+
+                    <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}" alt="like"
+                                          height="25"></th>
+                    <td>{{ post.num_angry }}</td>
+                </tr>
+                <tr>
+                    <th>Anzahl Shares</th>
+                    <td>{{ post.num_shares }}</td>
+                    <th>Anzahl Comments</th>
+                    <td>{{ post.num_comments }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Comments
+                </div>
+                 <div class='panel-body fixed-panel'>
+                     <ul class="list-group">
+                         {% for comment in post.comments %}
+                             <li class="list-group-item">{{ comment }}</li>
+                         {% endfor %}
+                     </ul>
+                 </div>
             </div>
         </div>
     </div>
-
-
-    <table class="table">
-        <tbody>
-        <tr>
-            <th>Anzahl Likes <img src="{{ url_for('static', filename='images/emotions/like.png') }}" alt="like"
-                                  height="25"></th>
-            <td>{{ post.num_likes }}</td>
-
-            <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}" alt="like"
-                                 height="25"></th>
-            <td>{{ post.num_love }}</td>
-        </tr>
-        <tr>
-            <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}" alt="like"
-                                 height="25"></th>
-            <td>{{ post.num_haha }}</td>
-
-            <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
-                                height="25"
-            ></th>
-            <td>{{ post.num_wow }}</td>
-        </tr>
-        <tr>
-            <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
-                                height="25"
-            ></th>
-            <td>{{ post.num_sad }}</td>
-
-            <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}" alt="like"
-                                  height="25"></th>
-            <td>{{ post.num_angry }}</td>
-        </tr>
-        <tr>
-            <th>Anzahl Shares</th>
-            <td>{{ post.num_shares }}</td>
-            <th>Anzahl Comments</th>
-            <td>{{ post.num_comments }}</td>
-        </tr>
-        </tbody>
-    </table>
 
 
     <div class="panel panel-default">
@@ -111,7 +127,7 @@
                 <input type="hidden" name="post_id" value="{{ post.id }}">
                 <div class="form-group row">
                     <div class="col col-lg-12">
-                        <label for="category">Category</label>
+                        <label for="category">Kategorie</label>
                         <select class="form-control" name="category">
                             <option>Produkt Werbung</option>
                             <option>Besondere Aktion (Rabatt)</option>

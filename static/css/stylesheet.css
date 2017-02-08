@@ -1,3 +1,16 @@
 .bottom-buffer {
     margin-bottom: 20px;
 }
+
+.fixed-panel {
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+li {
+  word-wrap:break-word;
+}
+
+.btn:focus,.btn:active {
+   outline: none !important;
+}
