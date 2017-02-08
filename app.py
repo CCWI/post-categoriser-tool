@@ -39,14 +39,15 @@ def getpost(post_id):
     # get post info from the database
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
-        'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad,name,type, picture,source,permanent_link FROM post WHERE id = "' + str(
+        'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad,name,type, picture,source,permanent_link,date, paid FROM post WHERE id = "' + str(
             post_id) + '"')
     if cursor.rowcount == 0 or cursor.rowcount > 1:
         raise ValueError
     row = cursor.fetchall()[0]
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': row[9].upper(),
-            'picture': row[10], 'source': row[11], 'perm_link': row[12], 'id': post_id}
+            'picture': row[10], 'source': row[11], 'perm_link': row[12], 'date': row[13], 'paid': row[14],
+            'id': post_id}
     cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
     # add comments
     post['comments'] = []
@@ -96,4 +97,4 @@ def get_db_connection():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port) #NOSONAR
+    app.run(host='0.0.0.0', port=port)  # NOSONAR

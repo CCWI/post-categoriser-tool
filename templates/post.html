@@ -101,6 +101,13 @@
                     <th>Anzahl Comments</th>
                     <td>{{ post.num_comments }}</td>
                 </tr>
+                <tr>
+                    <th>Datum</th>
+                    <td>{{ post.date }}</td>
+                    <th>Paid</th>
+                    <td><input type="checkbox" name="paid" value={{ post.paid }} disabled readonly></td>
+                    <td></td>
+                </tr>
                 </tbody>
             </table>
         </div>
