@@ -32,7 +32,6 @@ def generate():
         random = randint(1, 10)
 
         if random == 1:
-            print('old')
             cursor.execute('SELECT post_id FROM category WHERE post_id NOT IN (SELECT post_id FROM category ' +
                            'WHERE user = "' + auth.username() + '")' +
                            'GROUP BY post_id ORDER BY count(post_id) ASC, rand() LIMIT 1')
