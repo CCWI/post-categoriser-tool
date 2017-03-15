@@ -1,16 +1,23 @@
 import os
-import random
+from random import randint
 
-from flask import Flask, render_template
 import mysql.connector as mariadb
+from flask import Flask, render_template
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask_httpauth import HTTPBasicAuth
 
-from config import db_host, db_port, db_user, db_password, db_name
+from config import db_host, db_port, db_user, db_password, db_name, users
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
 
+@auth.get_password
+def get_pw(username):
+    if username in users:
+        return users.get(username)
+    return None
 
 @app.route('/')
 def main():
@@ -19,17 +26,27 @@ def main():
 
 @app.route('/generate')
 def generate():
-    mariadb_connection = get_db_connection()
-    cursor = mariadb_connection.cursor(buffered=True)
-    cursor.execute('SELECT id FROM post WHERE category IS NULL')
-    rows = cursor.fetchall()
-    mariadb_connection.close()
-    if cursor.rowcount == 0:
-        return render_template('alldone.html')
-    else:
-        post_id = random.choice(rows)[0]
-        return redirect(url_for('getpost', post_id=post_id))
+    try:
+        mariadb_connection = get_db_connection()
+        cursor = mariadb_connection.cursor(buffered=True)
+        random = randint(1, 10)
 
+        if random == 1:
+            print('old')
+            cursor.execute('SELECT post_id FROM category WHERE post_id NOT IN (SELECT post_id FROM category ' +
+                           'WHERE user = "' + auth.username() + '")' +
+                           'GROUP BY post_id ORDER BY count(post_id) ASC, rand() LIMIT 1')
+        if random != 1 or cursor.rowcount == 0:
+            cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) ORDER BY rand() LIMIT 1')
+
+        if cursor.rowcount == 0:
+            return render_template('alldone.html')
+        else:
+            rows = cursor.fetchone()
+            post_id = rows[0]
+            return redirect(url_for('getpost', post_id=post_id))
+    finally:
+        mariadb_connection.close()
 
 @app.route('/post/<post_id>')
 def getpost(post_id):
@@ -65,6 +82,7 @@ def getpost(post_id):
 
 
 @app.route('/update', methods=['POST'])
+@auth.login_required
 def update():
     # Read form from request
     cat = request.form["category"]
@@ -73,15 +91,13 @@ def update():
     id = request.form["post_id"]
 
     # Build statements
-    stmt = 'UPDATE post SET category = "' + cat + '" WHERE id = "' + id + '"'
-    stmt2 = 'UPDATE post SET successful = ' + str(succ) + ' WHERE id = "' + id + '"'
+    stmt = "REPLACE INTO category(user, post_id, category, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
 
     # Update Record in Database
     print('Updating record ' + str(id))
     connection = get_db_connection()
     cursor = connection.cursor(buffered=True)
-    cursor.execute(stmt)
-    cursor.execute(stmt2)
+    cursor.execute(stmt, (auth.username(), id, cat, sentiment, succ))
     connection.commit()
     connection.close()
 
