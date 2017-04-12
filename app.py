@@ -73,11 +73,13 @@ def getpost(post_id):
             post['comments'].append(comment[0])
 
     post['num_comments'] = len(post['comments'])
+    cursor.execute('SELECT id, name FROM category_name')
+    category_names = cursor.fetchall()
     # close database connection
     mariadb_connection.close()
 
     # retrun post page
-    return render_template('post.html', post=post)
+    return render_template('post.html', post=post, category_names=category_names)
 
 
 @app.route('/update', methods=['POST'])
@@ -90,7 +92,7 @@ def update():
     id = request.form["post_id"]
 
     # Build statements
-    stmt = "REPLACE INTO category(user, post_id, category, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
+    stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
 
     # Update Record in Database
     print('Updating record ' + str(id))
