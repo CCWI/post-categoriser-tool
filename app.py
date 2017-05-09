@@ -2,18 +2,26 @@ import os
 from random import randint
 
 import mysql.connector as mariadb
+import requests
+from flask import Flask, render_template
 from flask import Flask, render_template, flash
 from flask import redirect
 from flask import request
 from flask import url_for
 from flask_httpauth import HTTPBasicAuth
 
-from config import db_host, db_port, db_user, db_password, db_name, users
+from config import db_host, db_port, db_user, db_password, db_name, users, api_access_token_value
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
 
+api_url = 'https://graph.facebook.com/v2.9/'
+api_access_token_name = 'access_token'
+api_post_field_name = 'fields'
+api_post_field_value = 'source,picture'
+
+payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
 @auth.get_password
 def get_pw(username):
@@ -64,9 +72,21 @@ def getpost(post_id):
     if cursor.rowcount == 0 or cursor.rowcount > 1:
         raise ValueError
     row = cursor.fetchall()[0]
+
+    type = row[9].upper()
+    picture = row[10]
+    source = row[11]
+
+    r = requests.get(api_url + post_id, params=payload)
+
+    # retrieve new video or picture url as these expire after some time
+    if type in ['VIDEO', 'PHOTO']:
+        source = r.json().get('source')
+        picture = r.json().get('picture')
+
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
-            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': row[9].upper(),
-            'picture': row[10], 'source': row[11], 'perm_link': row[12], 'date': row[13], 'paid': row[14],
+            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
+            'picture': picture, 'source': source, 'perm_link': row[12], 'date': row[13], 'paid': row[14],
             'id': post_id}
     cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
 
