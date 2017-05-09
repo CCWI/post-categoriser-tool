@@ -83,8 +83,8 @@ def getpost(post_id):
         picture = r.json().get('picture')
 
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
-            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': row[9].upper(),
-            'picture': row[10], 'source': row[11], 'perm_link': row[12], 'date': row[13], 'paid': row[14],
+            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
+            'picture': picture, 'source': source, 'perm_link': row[12], 'date': row[13], 'paid': row[14],
             'id': post_id}
     cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
     # add comments
