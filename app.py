@@ -13,11 +13,13 @@ from config import db_host, db_port, db_user, db_password, db_name, users
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 
+
 @auth.get_password
 def get_pw(username):
     if username in users:
         return users.get(username)
     return None
+
 
 @app.route('/')
 def main():
@@ -46,6 +48,7 @@ def generate():
             return redirect(url_for('getpost', post_id=post_id))
     finally:
         mariadb_connection.close()
+
 
 @app.route('/post/<post_id>')
 def getpost(post_id):
@@ -90,7 +93,7 @@ def update():
     succ = request.form['success']
     sentiment = request.form['sentiment']
     id = request.form["post_id"]
-
+    
     # Build statements
     stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
 
