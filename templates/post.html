@@ -10,9 +10,23 @@
 <body>
 
 <div class="container">
+
+
     <div class="header bottom-buffer">
         <h3 class="text-muted">Facebook Post Categoriser</h3>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert alert-danger row">
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <div class="row">
         <div class="col col-md-8">
@@ -128,6 +142,7 @@
 
 
     <div class="panel panel-default">
+
         <div class="panel-body">
             <form action="{{ url_for('update') }}" method="POST">
                 <input type="hidden" name="post_id" value="{{ post.id }}">
@@ -155,9 +170,8 @@
                                 Erfolgreich
                             </label>
                             <label class="btn btn-danger">
-                                <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off"
-                                       checked> Nicht
-                                Erfolgreich
+                                <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off">
+                                Nicht Erfolgreich
                             </label>
                         </div>
                     </div>
@@ -169,8 +183,7 @@
                                 Positive
                             </label>
                             <label class="btn btn-warning active">
-                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off"
-                                       checked> Neutral
+                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off"> Neutral
                             </label>
                             <label class="btn btn-danger">
                                 <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off">
@@ -179,6 +192,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <button type="submit" class="btn btn-primary btn-block">Speichern</button>
 

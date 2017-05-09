@@ -2,7 +2,7 @@ import os
 from random import randint
 
 import mysql.connector as mariadb
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -12,6 +12,7 @@ from config import db_host, db_port, db_user, db_password, db_name, users
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
+app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
 
 
 @auth.get_password
@@ -68,6 +69,7 @@ def getpost(post_id):
             'picture': row[10], 'source': row[11], 'perm_link': row[12], 'date': row[13], 'paid': row[14],
             'id': post_id}
     cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
+
     # add comments
     post['comments'] = []
     comments = cursor.fetchall()
@@ -89,10 +91,19 @@ def getpost(post_id):
 @auth.login_required
 def update():
     # Read form from request
-    cat = request.form["category"]
-    succ = request.form['success']
-    sentiment = request.form['sentiment']
+    cat = request.form.get("category", None)
+    succ = request.form.get('success', None)
+    sentiment = request.form.get('sentiment', None)
     id = request.form["post_id"]
+
+    if cat is None:
+        flash('Bitte wählen Sie eine Kategorie aus.')
+    if succ is None:
+        flash('Bitte selektieren Sie ob diese Post erfolgreich war oder nicht.')
+    if sentiment is None:
+        flash('Bitte selektieren Sie ob das Gefühl aller Beiträge positive, negativ oder neutral ist.')
+
+    return redirect(url_for('getpost', post_id=id))
 
     # Build statements
     stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
