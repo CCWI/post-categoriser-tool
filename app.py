@@ -93,7 +93,7 @@ def update():
     succ = request.form['success']
     sentiment = request.form['sentiment']
     id = request.form["post_id"]
-    
+
     # Build statements
     stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
 
