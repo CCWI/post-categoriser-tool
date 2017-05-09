@@ -19,7 +19,7 @@ app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
 api_url = 'https://graph.facebook.com/v2.9/'
 api_access_token_name = 'access_token'
 api_post_field_name = 'fields'
-api_post_field_value = 'source,picture'
+api_post_field_value = 'source,full_picture'
 
 payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
@@ -82,7 +82,7 @@ def getpost(post_id):
     # retrieve new video or picture url as these expire after some time
     if type in ['VIDEO', 'PHOTO']:
         source = r.json().get('source')
-        picture = r.json().get('picture')
+        picture = r.json().get('full_picture')
 
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
@@ -115,15 +115,20 @@ def update():
     succ = request.form.get('success', None)
     sentiment = request.form.get('sentiment', None)
     id = request.form["post_id"]
+    error = 0
 
     if cat is None:
         flash('Bitte wählen Sie eine Kategorie aus.')
+        error = 1
     if succ is None:
         flash('Bitte wählen Sie aus, ob dieser Post erfolgreich war oder nicht.')
+        error = 1
     if sentiment is None:
         flash('Bitte wählen Sie aus, ob die Stimmung aller Kommentare positiv, neutral oder negativ ist.')
+        error = 1
 
-    return redirect(url_for('getpost', post_id=id))
+    if error == 1:
+        return redirect(url_for('getpost', post_id=id))
 
     # Build statements
     stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful) VALUES(%s, %s, %s, %s, %s)"
