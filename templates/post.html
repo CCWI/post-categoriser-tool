@@ -39,7 +39,7 @@
                             {% endif %}
                         </div>
                         <div class="col col-xs-4">
-            <span class="pull-right"><p> Type:
+            <span class="pull-right"><p> Typ:
                 {% if post.type is not none %}
                     <strong>{{ post.type }}</strong>
                 {% endif %}
@@ -112,11 +112,11 @@
                 <tr>
                     <th>Anzahl Shares</th>
                     <td>{{ post.num_shares }}</td>
-                    <th>Anzahl Comments</th>
+                    <th>Anzahl Kommentare</th>
                     <td>{{ post.num_comments }}</td>
                 </tr>
                 <tr>
-                    <th>Datum</th>
+                    <th>Erstellungsdatum</th>
                     <td>{{ post.date }}</td>
                     <th></th>
                     <td></td>
@@ -127,7 +127,7 @@
         <div class="col col-md-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    Comments
+                    Kommentare des Beitrags
                 </div>
                 <div class='panel-body fixed-panel'>
                     <ul class="list-group">
@@ -163,31 +163,32 @@
                 </div>
                 <div class="form-group row">
                     <div class="col col-sm-6">
-                        <label for="success">Erfolgreich</label>
+                        <label for="success">Erfolg des Beitrags</label>
                         <div class="btn-group btn-group-justified" data-toggle="buttons">
                             <label class="btn btn-success">
                                 <input type="radio" name="success" id="succesful" value="1" autocomplete="off">
-                                Erfolgreich
+                                erfolgreich
                             </label>
                             <label class="btn btn-danger">
                                 <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off">
-                                Nicht Erfolgreich
+                                nicht erfolgreich
                             </label>
                         </div>
                     </div>
                     <div class="col col-sm-6">
-                        <label for="sentiment">Sentiment </label>
+                        <label for="sentiment">Sentiment der Kommentare des Beitrags</label>
                         <div class="btn-group btn-group-justified" data-toggle="buttons">
                             <label class="btn btn-success">
                                 <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off">
-                                Positive
+                                positiv
                             </label>
                             <label class="btn btn-warning active">
-                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off"> Neutral
+                                <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off">
+                                neutral
                             </label>
                             <label class="btn btn-danger">
                                 <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off">
-                                Negative
+                                negativ
                             </label>
                         </div>
                     </div>
