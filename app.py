@@ -119,9 +119,9 @@ def update():
     if cat is None:
         flash('Bitte wählen Sie eine Kategorie aus.')
     if succ is None:
-        flash('Bitte selektieren Sie ob diese Post erfolgreich war oder nicht.')
+        flash('Bitte wählen Sie aus, ob dieser Post erfolgreich war oder nicht.')
     if sentiment is None:
-        flash('Bitte selektieren Sie ob das Gefühl aller Beiträge positive, negativ oder neutral ist.')
+        flash('Bitte wählen Sie aus, ob die Stimmung aller Kommentare positiv, neutral oder negativ ist.')
 
     return redirect(url_for('getpost', post_id=id))
 
