@@ -7,7 +7,19 @@
     <div class="container">
         <div class="jumbotron">
             <h1>Facebook Post Categoriser</h1>
-            <p>...</p>
+            <p>Im Rahmen des Projekts Ampel sollen Empfehlungen und Hilfestellungen erstellt werden, die es einem
+                Benutzer erlauben, die Qualität eigener Beiträge in Sozialen Netzwerken zu verbessern.</p>
+            <p>Die Grundlage der Empfehlungen bildet ein Modell aus Beiträgen. Zur Bildung des Modells müssen Beiträge
+                und Kommentare durch die Mithilfe von Experten um weitere Informationen ergänzt werden. Dazu zählen die
+                Kategorie des Beitrags sowie eine Einschätzung zum Erfolg des Beitrags.</p>
+            <p>Die Datensammlung umfasst insgesamt {{ statistic.total }} Beiträge, von denen
+                bisher {{ statistic.current }} Beiträge ({{ statistic.percent }} %) kategorisiert wurden.</p>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"
+                     style="min-width: 5em; width: {{ statistic.percent }}%;">
+                    {{ statistic.percent }}%
+                </div>
+            </div>
             <p>
                 <a class="btn btn-primary btn-lg" href="/generate" role="button">Start</a>
                 <a class="btn btn-primary btn-lg" href="/help" role="button">Hilfe</a>
