@@ -5,6 +5,7 @@
     <title>Categoriser Tool</title>
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/stylesheet.css') }}" rel="stylesheet">
+    <!--    <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}" rel="stylesheet">-->
 </head>
 
 <body>
@@ -131,9 +132,12 @@
                 </div>
                 <div class='panel-body fixed-panel'>
                     <ul class="list-group">
-                        {% for comment in post.comments %}
-                            <li class="list-group-item">{{ comment }}</li>
-                        {% endfor %}
+                        {%- for key, value in post.comments.items() recursive %}
+                            <li> {{ key[0] }}
+                            {%-if value %}
+                               <ul> {{ loop(value.items()) }}</ul>
+                            {%- endif %} </li>
+                        {%- endfor %}
                     </ul>
                 </div>
             </div>
@@ -210,6 +214,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
         integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
         crossorigin="anonymous"></script>
+<!--<script src="{{ url_for('static', filename='css/bootstrap-treeview.min.js') }}"></script>-->
 </body>
 
 </html>

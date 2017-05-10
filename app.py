@@ -9,6 +9,7 @@ from flask import redirect
 from flask import request
 from flask import url_for
 from flask_httpauth import HTTPBasicAuth
+from tree import build_tree, sort_tree
 
 from config import db_host, db_port, db_user, db_password, db_name, users, api_access_token_value
 
@@ -88,14 +89,16 @@ def getpost(post_id):
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
             'picture': picture, 'source': source, 'perm_link': row[12], 'date': row[13], 'paid': row[14],
             'id': post_id}
-    cursor.execute('SELECT text from comment where post_id ="' + post_id + '"')
-
+    # cursor.execute('SELECT text, id, parent_id from comment where post_id ="' + post_id + '"')
+    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="145689658812333_1000436476670976"')
     # add comments
     post['comments'] = []
     comments = cursor.fetchall()
-    for comment in comments:
-        if comment[0].strip() != "":
-            post['comments'].append(comment[0])
+
+    tree = build_tree(comments)
+    sort_tree(tree)
+
+    post['comments'] = tree
 
     post['num_comments'] = len(post['comments'])
     cursor.execute('SELECT id, name FROM category_name')
@@ -116,13 +119,13 @@ def update():
     sentiment = request.form.get('sentiment', None)
     id = request.form["post_id"]
 
+    # Validation checks
     if cat is None:
         flash('Bitte wählen Sie eine Kategorie aus.')
     if succ is None:
         flash('Bitte selektieren Sie ob diese Post erfolgreich war oder nicht.')
     if sentiment is None:
         flash('Bitte selektieren Sie ob das Gefühl aller Beiträge positive, negativ oder neutral ist.')
-
     return redirect(url_for('getpost', post_id=id))
 
     # Build statements
