@@ -131,14 +131,18 @@
                     Kommentare des Beitrags
                 </div>
                 <div class='panel-body fixed-panel'>
-                    <ul class="list-group">
-                        {%- for key, value in post.comments.items() recursive %}
-                            <li> {{ key[0] }}
-                            {%-if value %}
-                               <ul> {{ loop(value.items()) }}</ul>
-                            {%- endif %} </li>
-                        {%- endfor %}
-                    </ul>
+                    <div class="list-group list-group-root well">
+                        <ul>
+                            {%- for key, value in post.comments.items() recursive %}
+                                {%-if value %}
+                                    <li> {{ key[0] }} </li>
+                                    <ul> {{ loop(value.items()) }}</ul>
+                                {% else %}
+                                    <li> {{ key[0] }} </li>
+                                {%- endif %}
+                            {%- endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
