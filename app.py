@@ -93,7 +93,7 @@ def getpost(post_id):
     # get post info from the database
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
-        'SELECT text,num_likes,num_shares,num_angry,num_haha,num_wow,num_love,num_sad,name,type, picture,source,permanent_link,date, paid FROM post WHERE id = "' + str(
+        'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = "' + str(
             post_id) + '"')
     if cursor.rowcount == 0 or cursor.rowcount > 1:
         raise ValueError
@@ -102,7 +102,7 @@ def getpost(post_id):
     type = row[9].upper()
     picture = row[10]
     source = row[11]
-    date = row[13]
+    post_date = row[13]
 
     r = requests.get(api_url + post_id, params=payload)
 
@@ -113,8 +113,8 @@ def getpost(post_id):
 
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
-            'picture': picture, 'source': source, 'perm_link': row[12], 'date': date, 'paid': row[14],
-            'id': post_id}
+            'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
+            'owner': row[15], 'id': post_id}
     # cursor.execute('SELECT text, id, parent_id from comment where post_id ="' + post_id + '"')
     cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="145689658812333_1000436476670976"')
     # add comments
@@ -132,10 +132,11 @@ def getpost(post_id):
     # close database connection
     mariadb_connection.close()
 
-    reactions_available = date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
+    # reactions became globally active on february the 24th in 2016
+    reactions_available = post_date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
     info = {"reactions_available": reactions_available}
 
-    # retrun post page
+    # return post page
     return render_template('post.html', post=post, category_names=category_names, info=info)
 
 
