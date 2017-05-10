@@ -24,6 +24,7 @@ api_post_field_value = 'source,full_picture'
 
 payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
+
 @auth.get_password
 def get_pw(username):
     if username in users:
@@ -33,11 +34,31 @@ def get_pw(username):
 
 @app.route('/')
 def main():
-    return render_template('index.html')
+    total = 0
+    current = 0
+    percent = 0
+    mariadb_connection = get_db_connection()
+    cursor = mariadb_connection.cursor(buffered=True)
+    cursor.execute(
+        'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id)')
+    if cursor.rowcount == 0:
+        return render_template('alldone.html')
+    else:
+        row = cursor.fetchone()
+        total = row[0]
+        current = row[1]
+        percent = row[2]
+
+    statistic = {"total": total,
+                 "current": current,
+                 "percent": percent}
+    return render_template('index.html', statistic=statistic)
+
 
 @app.route('/help')
 def help():
     return render_template('help.html')
+
 
 @app.route('/generate')
 def generate():
