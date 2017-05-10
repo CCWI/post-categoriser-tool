@@ -80,34 +80,42 @@
                                               alt="like"
                                               height="25"></th>
                         <td>{{ post.num_likes }}</td>
-
-                        <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}"
-                                             alt="like"
-                                             height="25"></th>
-                        <td>{{ post.num_love }}</td>
+                        {% if info.reactions_available == True %}
+                            <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}"
+                                                 alt="like"
+                                                 height="25"></th>
+                            <td>{{ post.num_love }}</td>
+                        {% else %}
+                            <th></th>
+                            <td></td>
+                        {% endif %}
                     </tr>
-                    <tr>
-                        <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}"
-                                             alt="like"
-                                             height="25"></th>
-                        <td>{{ post.num_haha }}</td>
+                    {% if info.reactions_available == True %}
+                        <tr>
+                            <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}"
+                                                 alt="like"
+                                                 height="25"></th>
+                            <td>{{ post.num_haha }}</td>
 
-                        <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}" alt="like"
-                                            height="25"
-                        ></th>
-                        <td>{{ post.num_wow }}</td>
-                    </tr>
-                    <tr>
-                        <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}" alt="like"
-                                            height="25"
-                        ></th>
-                        <td>{{ post.num_sad }}</td>
+                            <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}"
+                                                alt="like"
+                                                height="25"
+                            ></th>
+                            <td>{{ post.num_wow }}</td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}"
+                                                alt="like"
+                                                height="25"
+                            ></th>
+                            <td>{{ post.num_sad }}</td>
 
-                        <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}"
-                                              alt="like"
-                                              height="25"></th>
-                        <td>{{ post.num_angry }}</td>
-                    </tr>
+                            <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}"
+                                                  alt="like"
+                                                  height="25"></th>
+                            <td>{{ post.num_angry }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <th>Anzahl Shares</th>
                         <td>{{ post.num_shares }}</td>

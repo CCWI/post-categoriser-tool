@@ -3,6 +3,7 @@ from random import randint
 
 import mysql.connector as mariadb
 import requests
+from datetime import datetime
 from flask import Flask, render_template
 from flask import Flask, render_template, flash
 from flask import redirect
@@ -101,6 +102,7 @@ def getpost(post_id):
     type = row[9].upper()
     picture = row[10]
     source = row[11]
+    date = row[13]
 
     r = requests.get(api_url + post_id, params=payload)
 
@@ -111,7 +113,7 @@ def getpost(post_id):
 
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
-            'picture': picture, 'source': source, 'perm_link': row[12], 'date': row[13], 'paid': row[14],
+            'picture': picture, 'source': source, 'perm_link': row[12], 'date': date, 'paid': row[14],
             'id': post_id}
     # cursor.execute('SELECT text, id, parent_id from comment where post_id ="' + post_id + '"')
     cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="145689658812333_1000436476670976"')
@@ -130,8 +132,11 @@ def getpost(post_id):
     # close database connection
     mariadb_connection.close()
 
+    reactions_available = date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
+    info = {"reactions_available": reactions_available}
+
     # retrun post page
-    return render_template('post.html', post=post, category_names=category_names)
+    return render_template('post.html', post=post, category_names=category_names, info=info)
 
 
 @app.route('/update', methods=['POST'])
