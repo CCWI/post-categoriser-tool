@@ -14,3 +14,7 @@ li {
 .btn:focus,.btn:active {
    outline: none !important;
 }
+
+.list-group-item .glyphicon {
+    margin-right: 10px;
+}
