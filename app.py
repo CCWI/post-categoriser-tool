@@ -118,8 +118,7 @@ def getpost(post_id):
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
             'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
             'owner': row[15], 'id': post_id}
-    # cursor.execute('SELECT text, id, parent_id from comment where post_id ="' + post_id + '"')
-    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="145689658812333_1000436476670976"')
+    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
     # add comments
     post['comments'] = []
     comments = cursor.fetchall()
@@ -137,7 +136,9 @@ def getpost(post_id):
 
     # reactions became globally active on february the 24th in 2016
     reactions_available = post_date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
-    info = {"reactions_available": reactions_available}
+    work_time = datetime.now()
+    info = {"reactions_available": reactions_available,
+            "work_time": work_time}
 
     # return post page
     return render_template('post.html', post=post, category_names=category_names, info=info)
@@ -151,6 +152,8 @@ def update():
     succ = request.form.get('success', None)
     sentiment = request.form.get('sentiment', None)
     id = request.form["post_id"]
+    # duration = datetime.now() - datetime.strptime(request.form["work_time"], "%a %b %d %H:%M:%S %Y")
+    # print(duration)
     error = 0
 
     # Validation checks
