@@ -35,6 +35,9 @@ def get_pw(username):
 def main():
     return render_template('index.html')
 
+@app.route('/help')
+def help():
+    return render_template('help.html')
 
 @app.route('/generate')
 def generate():

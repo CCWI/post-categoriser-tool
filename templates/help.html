@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Hilfe{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="header bottom-buffer">
+            <h3 class="text-muted">Facebook Post Categoriser</h3>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">Überblick</div>
+            <div class="panel-body">
+                <p>Für die Bildung eines Modells ist eine Reihe manueller Ergänzungen der Daten notwendig. Hierzu zählen
+                    die
+                    Zuordnung zu einer Kategorie und die Bewertung des Erfolgs. Die Kategorie beschreibt, um welche Art
+                    von
+                    Marketing es sich im jeweiligen Post handelt (der Zweck), wie z. B. Produktwerbung.</p>
+                <p>Ziel des Vorgehens ist es, ein Modell zu entwickeln, das Posts automatisiert in Kategorien einteilen
+                    kann. Hierfür wurde in Zusammenarbeit mit dem Kooperationspartner ein Satz an Kategorien entwickelt.
+                <p>Der Faktor „Erfolg“ ist von der Subjektiven Einschätzung des jeweiligen Experten abhängig. Durch die
+                    Überführung in das Modell, soll dieser objektiviert werden. Dazu werden Beiträge in erfolgreiche und
+                    nicht erfolgreiche klassifiziert. Später soll es damit möglich sein, den Erfolg anhand anderer
+                    Eingabeparameter zu prognostizieren. Genauso wie die Kategorisierung handelt es sich an dieser
+                    Stelle
+                    um eine manuelle Ergänzung der Daten.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

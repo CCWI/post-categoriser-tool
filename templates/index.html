@@ -1,23 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Sentiment Categoriser Tool</title>
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-
-<div class="container">
-    <div class="header">
-        <h3 class="text-muted">Facebook Comment Sentiment Categoriser</h3>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Facebook Post Categoriser</h1>
+            <p>...</p>
+            <p>
+                <a class="btn btn-primary btn-lg" href="/generate" role="button">Start</a>
+                <a class="btn btn-primary btn-lg" href="/help" role="button">Hilfe</a>
+            </p>
+        </div>
     </div>
-
-    <a href="/generate">
-        <button class="btn btn-primary btn-block" id="" strt_btn>Start</button>
-    </a>
-
-</div>
-</body>
-
-</html>
+{% endblock %}
