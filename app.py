@@ -26,6 +26,7 @@ api_post_field_value = 'source,full_picture'
 
 payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
+
 @auth.get_password
 def get_pw(username):
     if username in users:
@@ -37,9 +38,11 @@ def get_pw(username):
 def main():
     return render_template('index.html')
 
+
 @app.route('/help')
 def help():
     return render_template('help.html')
+
 
 @app.route('/generate')
 def generate():
@@ -94,8 +97,8 @@ def getpost(post_id):
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
             'picture': picture, 'source': source, 'perm_link': row[12], 'date': row[13], 'paid': row[14],
             'id': post_id}
-    # cursor.execute('SELECT text, id, parent_id from comment where post_id ="' + post_id + '"')
-    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="145689658812333_1000436476670976"')
+    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
+
     # add comments
     post['comments'] = []
     comments = cursor.fetchall()

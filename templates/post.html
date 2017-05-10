@@ -5,7 +5,6 @@
     <title>Categoriser Tool</title>
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/stylesheet.css') }}" rel="stylesheet">
-    <!--    <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}" rel="stylesheet">-->
 </head>
 
 <body>
@@ -131,17 +130,19 @@
                     Kommentare des Beitrags
                 </div>
                 <div class='panel-body fixed-panel'>
-                    <div class="list-group list-group-root well">
-                        <ul>
-                            {%- for key, value in post.comments.items() recursive %}
-                                {%-if value %}
-                                    <li> {{ key[0] }} </li>
-                                    <ul> {{ loop(value.items()) }}</ul>
-                                {% else %}
-                                    <li> {{ key[0] }} </li>
-                                {%- endif %}
-                            {%- endfor %}
-                        </ul>
+                    <div class="list-group list-group-root">
+                        {%- for key, value in post.comments.items() recursive %}
+                            {%-if value %}
+                                <a href={{ '#' + key[1] }} class="list-group-item" data-toggle="collapse"
+                                   data-target={{ '#' + key[1] }}>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>{{ key[0] }}
+                                </a>
+                                <div class="list-group collapse" id={{ key[1] }}>
+                                    {{ loop(value.items()) }}</div>
+                            {% else %}
+                                <a href="#" class="list-group-item"> {{ key[0] }} </a>
+                            {%- endif %}
+                        {%- endfor %}
                     </div>
                 </div>
             </div>
@@ -219,7 +220,15 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
         integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
         crossorigin="anonymous"></script>
-<!--<script src="{{ url_for('static', filename='css/bootstrap-treeview.min.js') }}"></script>-->
+<script>
+    $(function () {
+        $('.list-group-item').on('click', function () {
+            $('.glyphicon', this)
+                .toggleClass('glyphicon-chevron-right')
+                .toggleClass('glyphicon-chevron-down');
+        });
+    });
+</script>
 </body>
 
 </html>
