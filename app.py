@@ -7,7 +7,7 @@ import json
 import requests
 from datetime import datetime
 from flask import Flask, render_template
-from flask import Flask, render_template, flash, jsonify
+from flask import Flask, render_template, flash, abort
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -58,7 +58,6 @@ def main():
     return render_template('index.html', statistic=statistic)
 
 
-
 @app.route('/help')
 def help():
     return render_template('help.html')
@@ -96,10 +95,10 @@ def getpost(post_id):
     # get post info from the database
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
-        'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = "' + str(
-            post_id) + '"')
+        'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = %s',
+        (post_id,))
     if cursor.rowcount == 0 or cursor.rowcount > 1:
-        raise ValueError
+        abort(404)
     row = cursor.fetchall()[0]
 
     type = row[9].upper()
