@@ -44,9 +44,7 @@ def main():
     cursor = mariadb_connection.cursor(buffered=True)
     cursor.execute(
         'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id)')
-    if cursor.rowcount == 0:
-        return render_template('alldone.html')
-    else:
+    if cursor.rowcount != 0:
         row = cursor.fetchone()
         total = row[0]
         current = row[1]
