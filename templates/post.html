@@ -163,7 +163,10 @@
                     <div class="form-group row">
                         <div class="col col-lg-12">
 
-                            <label for="category">Kategorie</label>
+                            <label for="category">Kategorie
+                                <a href="#" data-toggle="tooltip" data-placement="right"
+                                   title="Bitte wählen Sie eine Kategorie für den Beitrag"><span
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
                             <div class="row">
                                 {% for category_name in category_names %}
                                     <div class="col-xs-6 radio">
@@ -177,7 +180,10 @@
                     </div>
                     <div class="form-group row">
                         <div class="col col-sm-6">
-                            <label for="success">Erfolg des Beitrags</label>
+                            <label for="success">Erfolg des Beitrags
+                                <a href="#" data-toggle="tooltip" data-placement="top"
+                                   title="Bitte bewerten Sie ob der Beitrag erfolgreich ist."><span
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
                                     <input type="radio" name="success" id="succesful" value="1" autocomplete="off">
@@ -190,7 +196,10 @@
                             </div>
                         </div>
                         <div class="col col-sm-6">
-                            <label for="sentiment">Sentiment der Kommentare des Beitrags</label>
+                            <label for="sentiment">Sentiment der Kommentare des Beitrags
+                                <a href="#" data-toggle="tooltip" data-placement="top"
+                                   title="Bitte bewerten Sie das Sentiment der Kommentare"><span
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
                                     <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off">
@@ -223,6 +232,7 @@
                     .toggleClass('glyphicon-chevron-right')
                     .toggleClass('glyphicon-chevron-down');
             });
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 {% endblock %}
