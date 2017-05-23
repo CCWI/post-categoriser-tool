@@ -7,13 +7,15 @@
     <div class="container">
         <div class="jumbotron">
             <h1>Facebook Post Categoriser</h1>
-            <p>Im Rahmen des Projekts Ampel sollen Empfehlungen und Hilfestellungen erstellt werden, die es einem
-                Benutzer erlauben, die Qualität eigener Beiträge in Sozialen Netzwerken zu verbessern.</p>
-            <p>Die Grundlage der Empfehlungen bildet ein Modell aus Beiträgen. Zur Bildung des Modells müssen Beiträge
-                und Kommentare durch die Mithilfe von Experten um weitere Informationen ergänzt werden, zu denen die
-                <i>Kategorie des Beitrags</i>, der <i>Erfolg des Beitrags</i> und das <i>Sentiment
-                    der Kommentare</i> zählen.</p>
-            <p>Die Datensammlung umfasst insgesamt {{ statistic.total }} Beiträge, von denen
+            <p><b>Projekt Ampel:</b> Im Rahmen des Projekts Ampel sollen Empfehlungen und Hilfestellungen erstellt
+                werden, die es einem
+                Benutzer erlauben, die Qualität eigener Beiträge (Posts) in Sozialen Onlinenetzwerken zu verbessern. Die
+                Grundlage der Empfehlungen bildet ein Modell aus kategorisierten Beiträgen.</p>
+            <p><b>Hinweis: </b> Für die Arbeit der Kategorisierung sind wir auf die freiwillige Unterstützung von
+                Experten angewiesen. Wir würden uns über Ihre Mithilfe daher sehr freuen. Sie gehen damit keinerlei Verpflichtung ein. Durch
+                den Aufbau der Umfrage können jederzeit einzelne Beiträge bewertet werden. Die Umfrage kann an jedem
+                Punkt unterbrochen und später fortgesetzt werden.</p>
+            <p><b>Fortschritt:</b> Die Datensammlung umfasst insgesamt {{ statistic.total }} Beiträge, von denen
                 bisher {{ statistic.current }} Beiträge ({{ statistic.percent }} %) kategorisiert wurden.</p>
             <div class="progress">
                 <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"
@@ -21,6 +23,9 @@
                     {{ statistic.percent }}%
                 </div>
             </div>
+            <p><b>Anleitung:</b> Versetzen Sie sich in die Situation des Unternehmens, das den Post veröffentlicht. Wie
+                bewerten Sie den Erfolg des Posts - mit Blick auf die angesprochenen Zielgruppen und den Typus des Posts
+                (Link, Video etc.)?</p>
             <div class="row">
                 <div class="col col-xs-5 col-md-4">
                     <a class="btn btn-primary btn-lg btn-block" href="/generate" role="button">Start</a>
