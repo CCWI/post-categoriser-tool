@@ -71,62 +71,68 @@
                                 </div>
                             {% endif %}
                         </div>
+
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <th>Anzahl Likes <img src="{{ url_for('static', filename='images/emotions/like.png') }}"
+                                                      alt="like"
+                                                      height="25"></th>
+                                <td>{{ post.num_likes }}</td>
+                                {% if info.reactions_available == True %}
+                                    <th>Anzahl Love <img
+                                            src="{{ url_for('static', filename='images/emotions/love.png') }}"
+                                            alt="like"
+                                            height="25"></th>
+                                    <td>{{ post.num_love }}</td>
+                                {% endif %}
+                            </tr>
+                            {% if info.reactions_available == True %}
+                                <tr>
+                                    <th>Anzahl Haha <img
+                                            src="{{ url_for('static', filename='images/emotions/haha.png') }}"
+                                            alt="like"
+                                            height="25"></th>
+                                    <td>{{ post.num_haha }}</td>
+
+                                    <th>Anzahl Wow <img
+                                            src="{{ url_for('static', filename='images/emotions/wow.png') }}"
+                                            alt="like"
+                                            height="25"
+                                    ></th>
+                                    <td>{{ post.num_wow }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Anzahl Sad <img
+                                            src="{{ url_for('static', filename='images/emotions/sad.png') }}"
+                                            alt="like"
+                                            height="25"
+                                    ></th>
+                                    <td>{{ post.num_sad }}</td>
+
+                                    <th>Anzahl Angry <img
+                                            src="{{ url_for('static', filename='images/emotions/angry.png') }}"
+                                            alt="like"
+                                            height="25"></th>
+                                    <td>{{ post.num_angry }}</td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <th>Anzahl Shares</th>
+                                <td>{{ post.num_shares }}</td>
+                                <th>Anzahl Kommentare</th>
+                                <td>{{ post.num_comments }}</td>
+                            </tr>
+                            <tr>
+                                <th>Erstellungsdatum</th>
+                                <td>{{ post.date }}</td>
+                                <th>Seite</th>
+                                <td>{{ post.owner }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <table class="table">
-                    <tbody>
-                    <tr>
-                        <th>Anzahl Likes <img src="{{ url_for('static', filename='images/emotions/like.png') }}"
-                                              alt="like"
-                                              height="25"></th>
-                        <td>{{ post.num_likes }}</td>
-                        {% if info.reactions_available == True %}
-                            <th>Anzahl Love <img src="{{ url_for('static', filename='images/emotions/love.png') }}"
-                                                 alt="like"
-                                                 height="25"></th>
-                            <td>{{ post.num_love }}</td>
-                        {% endif %}
-                    </tr>
-                    {% if info.reactions_available == True %}
-                        <tr>
-                            <th>Anzahl Haha <img src="{{ url_for('static', filename='images/emotions/haha.png') }}"
-                                                 alt="like"
-                                                 height="25"></th>
-                            <td>{{ post.num_haha }}</td>
-
-                            <th>Anzahl Wow <img src="{{ url_for('static', filename='images/emotions/wow.png') }}"
-                                                alt="like"
-                                                height="25"
-                            ></th>
-                            <td>{{ post.num_wow }}</td>
-                        </tr>
-                        <tr>
-                            <th>Anzahl Sad <img src="{{ url_for('static', filename='images/emotions/sad.png') }}"
-                                                alt="like"
-                                                height="25"
-                            ></th>
-                            <td>{{ post.num_sad }}</td>
-
-                            <th>Anzahl Angry <img src="{{ url_for('static', filename='images/emotions/angry.png') }}"
-                                                  alt="like"
-                                                  height="25"></th>
-                            <td>{{ post.num_angry }}</td>
-                        </tr>
-                    {% endif %}
-                    <tr>
-                        <th>Anzahl Shares</th>
-                        <td>{{ post.num_shares }}</td>
-                        <th>Anzahl Kommentare</th>
-                        <td>{{ post.num_comments }}</td>
-                    </tr>
-                    <tr>
-                        <th>Erstellungsdatum</th>
-                        <td>{{ post.date }}</td>
-                        <th>Seite</th>
-                        <td>{{ post.owner }}</td>
-                    </tr>
-                    </tbody>
-                </table>
             </div>
             <div class="col col-md-4">
                 <div class="panel panel-primary">
@@ -166,7 +172,9 @@
                             <label for="category">Kategorie
                                 <a href="#" data-toggle="tooltip" data-placement="right"
                                    title="Bitte wählen Sie eine Kategorie für den Beitrag"><span
-                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a>
+                                <span id="categoryError"></span>
+                            </label>
                             <div class="row">
                                 {% for category_name in category_names %}
                                     <div class="col-xs-6 radio">
@@ -174,9 +182,6 @@
                                                       value="{{ category_name[0] }}">{{ category_name[1] }}</label>
                                     </div>
                                 {% endfor %}
-                            </div>
-                        <div class="alert alert-danger collapse" id="categoryErrorAlert">
-                                <div class="flashes" id="categoryError"></div>
                             </div>
                         </div>
                     </div>
@@ -186,14 +191,18 @@
                             <label for="success">Erfolg des Beitrags
                                 <a href="#" data-toggle="tooltip" data-placement="top"
                                    title="Bitte bewerten Sie ob der Beitrag erfolgreich ist."><span
-                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a>
+                                <span id="successError"></span>
+                            </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
-                                    <input type="radio" name="success" id="succesful" value="1" autocomplete="off" required>
+                                    <input type="radio" name="success" id="succesful" value="1" autocomplete="off"
+                                           required>
                                     erfolgreich
                                 </label>
                                 <label class="btn btn-danger">
-                                    <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off" required>
+                                    <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off"
+                                           required>
                                     nicht erfolgreich
                                 </label>
                             </div>
@@ -202,18 +211,23 @@
                             <label for="sentiment">Sentiment der Kommentare des Beitrags
                                 <a href="#" data-toggle="tooltip" data-placement="top"
                                    title="Bitte bewerten Sie das Sentiment der Kommentare"><span
-                                        class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
+                                        class="glyphicon glyphicon-question-sign ml-1"></span></a>
+                                <span id="sentimentError"></span>
+                            </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
-                                    <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off" required>
+                                    <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off"
+                                           required>
                                     positiv
                                 </label>
                                 <label class="btn btn-warning active">
-                                    <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off" required>
+                                    <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off"
+                                           required>
                                     neutral
                                 </label>
                                 <label class="btn btn-danger">
-                                    <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off" required>
+                                    <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off"
+                                           required>
                                     negativ
                                 </label>
                             </div>
@@ -245,14 +259,14 @@
             },
             errorPlacement: function (error, element) {
                 if (element.attr("name") == "category") {
-                    // error.insertAfter("#categoryError");
-                    // $('#categoryErrorAlert').show();
+                    error.insertAfter("#categoryError");
+                    $('#categoryErrorAlert').show();
                 } else if (element.attr("name") == "success") {
                     error.insertAfter("#successError");
                     $('#categoryErrorAlert').show();
                 } else if (element.attr("name") == "sentiment") {
-                    // error.insertAfter("#sentimentError");
-                    // $('#categoryErrorAlert').show();
+                    error.insertAfter("#sentimentError");
+                    $('#categoryErrorAlert').show();
                 } else {
                     error.insertAfter(element);
                 }
