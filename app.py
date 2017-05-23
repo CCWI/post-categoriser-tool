@@ -155,34 +155,19 @@ def update():
     # Read form from request
     cat = request.form.get("category", None)
     succ = request.form.get('success', None)
-    sentiment = request.form.get('sentiment', None)
     id = request.form["post_id"]
     duration_seconds = (
         datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
     error = 0
 
-    # Validation checks
-    if cat is None:
-        flash('Bitte wählen Sie eine Kategorie aus.')
-        error = 1
-    if succ is None:
-        flash('Bitte wählen Sie aus, ob dieser Post erfolgreich war oder nicht.')
-        error = 1
-    if sentiment is None:
-        flash('Bitte wählen Sie aus, ob die Stimmung aller Kommentare positiv, neutral oder negativ ist.')
-        error = 1
-
-    if error == 1:
-        return redirect(url_for('getpost', post_id=id))
-
     # Build statements
-    stmt = "REPLACE INTO category(user, post_id, category_name_id, sentiment, successful, duration_seconds) VALUES(%s, %s, %s, %s, %s, %s)"
+    stmt = "REPLACE INTO category(user, post_id, category_name_id, successful, duration_seconds) VALUES(%s, %s, %s, %s, %s)"
 
     # Update Record in Database
     print('Updating record ' + str(id))
     connection = get_db_connection()
     cursor = connection.cursor(buffered=True)
-    cursor.execute(stmt, (auth.username(), id, cat, sentiment, succ, duration_seconds))
+    cursor.execute(stmt, (auth.username(), id, cat, succ, duration_seconds))
     connection.commit()
     connection.close()
 
