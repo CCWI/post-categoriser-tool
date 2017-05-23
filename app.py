@@ -111,7 +111,6 @@ def getpost(post_id):
         source = r.json().get('source')
         picture = r.json().get('full_picture')
 
-        print(source)
         if source is not None:
             # check if url is redirected
             response = requests.head(source, allow_redirects=True)
