@@ -3,7 +3,7 @@ import os
 from random import randint
 
 import mysql.connector as mariadb
-import json
+import re
 import requests
 from datetime import datetime
 from flask import Flask, render_template
