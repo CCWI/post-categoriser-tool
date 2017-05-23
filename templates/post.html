@@ -154,7 +154,7 @@
         </div>
 
 
-        <form action="{{ url_for('update') }}" method="POST">
+        <form action="{{ url_for('update') }}" method="POST" id="inputform">
             <div class="panel panel-default">
 
                 <div class="panel-body">
@@ -175,9 +175,12 @@
                                     </div>
                                 {% endfor %}
                             </div>
-
+                        <div class="alert alert-danger collapse" id="categoryErrorAlert">
+                                <div class="flashes" id="categoryError"></div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="form-group row">
                         <div class="col col-sm-6">
                             <label for="success">Erfolg des Beitrags
@@ -186,11 +189,11 @@
                                         class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
-                                    <input type="radio" name="success" id="succesful" value="1" autocomplete="off">
+                                    <input type="radio" name="success" id="succesful" value="1" autocomplete="off" required>
                                     erfolgreich
                                 </label>
                                 <label class="btn btn-danger">
-                                    <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off">
+                                    <input type="radio" name="success" id="not_succesful" value="0" autocomplete="off" required>
                                     nicht erfolgreich
                                 </label>
                             </div>
@@ -202,15 +205,15 @@
                                         class="glyphicon glyphicon-question-sign ml-1"></span></a> </label>
                             <div class="btn-group btn-group-justified" data-toggle="buttons">
                                 <label class="btn btn-success">
-                                    <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off">
+                                    <input type="radio" name="sentiment" id="positive" value="1" autocomplete="off" required>
                                     positiv
                                 </label>
                                 <label class="btn btn-warning active">
-                                    <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off">
+                                    <input type="radio" name="sentiment" id="neutral" value="0" autocomplete="off" required>
                                     neutral
                                 </label>
                                 <label class="btn btn-danger">
-                                    <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off">
+                                    <input type="radio" name="sentiment" id="negative" value="-1" autocomplete="off" required>
                                     negativ
                                 </label>
                             </div>
@@ -233,6 +236,27 @@
                     .toggleClass('glyphicon-chevron-down');
             });
             $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    <script>
+        jQuery("#inputform").validate({
+            rules: {
+                category: {required: true}
+            },
+            errorPlacement: function (error, element) {
+                if (element.attr("name") == "category") {
+                    // error.insertAfter("#categoryError");
+                    // $('#categoryErrorAlert').show();
+                } else if (element.attr("name") == "success") {
+                    error.insertAfter("#successError");
+                    $('#categoryErrorAlert').show();
+                } else if (element.attr("name") == "sentiment") {
+                    // error.insertAfter("#sentimentError");
+                    // $('#categoryErrorAlert').show();
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
     </script>
 {% endblock %}
