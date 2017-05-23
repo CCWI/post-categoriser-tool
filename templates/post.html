@@ -64,7 +64,14 @@
                                         <p>{{ post.text }}</p>
                                     </div>
                                 </div>
-
+                            {% elif post.type == "VIDEO" and post.picture is not none %}
+                                <div class="col col-sm-4 bottom-buffer ">
+                                    <img width="100%" src="{{ post.picture }}">
+                                </div>
+                                <div class="col col-sm-8">
+                                    <p>{{ post.text }}</p>
+                                    <p><b>Video zum Beitrag nicht mehr verfügbar!</b></p>
+                                </div>
                             {% else %}
                                 <div class="col col-md-12">
                                     <p>{{ post.text }}</p>

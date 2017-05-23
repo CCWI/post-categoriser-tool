@@ -111,6 +111,14 @@ def getpost(post_id):
         source = r.json().get('source')
         picture = r.json().get('full_picture')
 
+        print(source)
+        if source is not None:
+            # check if url is redirected
+            response = requests.head(source, allow_redirects=True)
+            # url is redirected if history exists
+            if response.history:
+                source = response.url
+
     post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
             'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
             'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
