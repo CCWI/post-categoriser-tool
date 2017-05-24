@@ -166,60 +166,59 @@
             </div>
         </div>
 
-
         <form action="{{ url_for('update') }}" method="POST" id="inputform">
             <div class="panel panel-default">
 
                 <div class="panel-body">
                     <input type="hidden" name="post_id" value="{{ post.id }}">
                     <input type="hidden" name="work_time" value="{{ info.work_time }}">
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col col-md-8">
-
-
-                            <label for="category">Kategorie
-                                <a href="#" data-toggle="tooltip" data-placement="right"
-                                   title="Bitte wählen Sie eine Kategorie für den Beitrag"><span
-                                        class="glyphicon glyphicon-question-sign ml-1"></span></a>
-                                <span id="categoryError"></span>
-                            </label>
-                            <div class="row">
-                                {% for category_name in category_names %}
-                                    <div class="radio">
-                                        <label><input type="radio" name="category"
-                                                      value="{{ category_name[0] }}">{{ category_name[1] }}</label>
-                                    </div>
-                                {% endfor %}
+                            <div class="form-group">
+                                <label for="category">Kategorie
+                                    <a href="#" data-toggle="tooltip" data-placement="right" id="catlabel"
+                                       title="Bitte wählen Sie eine Kategorie für den Beitrag"><span
+                                            class="glyphicon glyphicon-question-sign ml-1"></span></a>
+                                </label>
+                                <div class="input-group">
+                                    {% for category_name in category_names %}
+                                        <div class="radio">
+                                            <label><input type="radio" name="category"
+                                                          value="{{ category_name[0] }}">{{ category_name[1] }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
+                        </div>
 
-
-                            <div class="form-group row">
-                                <div class="col col-sm-6">
-                                    <label for="success">Erfolg des Beitrags
-                                        <a href="#" data-toggle="tooltip" data-placement="top"
-                                           title="Bitte bewerten Sie ob der Beitrag erfolgreich ist."><span
-                                                class="glyphicon glyphicon-question-sign ml-1"></span></a>
-                                        <span id="successError"></span>
-                                    </label>
-
+                        <div class="col col-md-4">
+                            <div class="form-group">
+                                <label for="success">Erfolg des Beitrags
+                                    <a href="#" data-toggle="tooltip" data-placement="top" id="successlabel"
+                                       title="Bitte bewerten Sie ob der Beitrag erfolgreich ist."><span
+                                            class="glyphicon glyphicon-question-sign ml-1"></span></a>
+                                </label>
+                                <div class="input-group">
                                     <div class="radio">
                                         <label class="radio-inline">
                                             <input type="radio" name="success" id="succesful" value="1" required>
                                             Erfolgreich
                                         </label>
                                         <label class="radio-inline">
-                                            <input type="radio" name="success" id="not_succesful" value="0" required>
+                                            <input type="radio" name="success" id="not_succesful" value="0">
                                             Nicht Erfolgreich
                                         </label>
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
+
                 </div>
             </div>
+
 
             <div class="form-group row">
                 <div class="col col-lg-12">
@@ -239,22 +238,29 @@
         });
     </script>
     <script>
-        jQuery("#inputform").validate({
+        $('#inputform').validate({
             rules: {
-                category: {required: true}
+                category: {
+                    required: true
+                },
+                success: {
+                    required: true
+                }
+            },
+            errorElement: "span",
+            errorClass: "help-block",
+            highlight: function (element, errorClass, validClass) {
+                $(element).closest('.form-group').addClass('has-error');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).closest('.form-group').removeClass('has-error');
             },
             errorPlacement: function (error, element) {
-                if (element.attr("name") == "category") {
-                    error.insertAfter("#categoryError");
-                    $('#categoryErrorAlert').show();
-                } else if (element.attr("name") == "success") {
-                    error.insertAfter("#successError");
-                    $('#categoryErrorAlert').show();
-                } else if (element.attr("name") == "sentiment") {
-                    error.insertAfter("#sentimentError");
-                    $('#categoryErrorAlert').show();
-                } else {
-                    error.insertAfter(element);
+                if (element.attr('name') == 'category') {
+                    error.insertAfter('#catlabel')
+                }
+                if (element.attr('name') == 'success') {
+                    error.insertAfter('#successlabel')
                 }
             }
         });
