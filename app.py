@@ -3,7 +3,6 @@ import os
 from random import randint
 
 import mysql.connector as mariadb
-import re
 import requests
 from datetime import datetime
 from flask import Flask, render_template
@@ -112,6 +111,10 @@ def getpost(post_id):
         picture = r.json().get('full_picture')
 
         if source is not None:
+            # fix youtube urls
+            if "youtube" in source:
+                source = source.replace("youtube.com/v/", "youtube.com/embed/")
+
             # check if url is redirected
             response = requests.head(source, allow_redirects=True)
             # url is redirected if history exists
