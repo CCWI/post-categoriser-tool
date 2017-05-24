@@ -18,3 +18,8 @@ li {
 .list-group-item .glyphicon {
     margin-right: 10px;
 }
+
+.help-block {
+    display: inline;
+    padding-left: 10px;
+}
