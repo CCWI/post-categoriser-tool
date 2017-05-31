@@ -39,20 +39,24 @@ def main():
     total = 0
     current = 0
     percent = 0
-    mariadb_connection = get_db_connection()
-    cursor = mariadb_connection.cursor(buffered=True)
-    cursor.execute(
-        'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id)')
-    if cursor.rowcount != 0:
-        row = cursor.fetchone()
-        total = row[0]
-        current = row[1]
-        percent = row[2]
+    try:
+        mariadb_connection = get_db_connection()
+        cursor = mariadb_connection.cursor(buffered=True)
+        cursor.execute(
+            'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id)')
+        if cursor.rowcount != 0:
+            row = cursor.fetchone()
+            total = row[0]
+            current = row[1]
+            percent = row[2]
 
-    statistic = {"total": total,
-                 "current": current,
-                 "percent": percent}
-    return render_template('index.html', statistic=statistic)
+        statistic = {"total": total,
+                     "current": current,
+                     "percent": percent}
+        return render_template('index.html', statistic=statistic)
+    finally:
+        # close database connection
+        mariadb_connection.close()
 
 
 @app.route('/help')
@@ -81,100 +85,106 @@ def generate():
             post_id = rows[0]
             return redirect(url_for('getpost', post_id=post_id))
     finally:
+        # close database connection
         mariadb_connection.close()
 
 
 @app.route('/post/<post_id>')
 def getpost(post_id):
-    # open database connection
-    mariadb_connection = get_db_connection()
+    try:
+        # open database connection
+        mariadb_connection = get_db_connection()
 
-    # get post info from the database
-    cursor = mariadb_connection.cursor(buffered=True)
-    cursor.execute(
-        'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = %s',
-        (post_id,))
-    if cursor.rowcount == 0 or cursor.rowcount > 1:
-        abort(404)
-    row = cursor.fetchall()[0]
+        # get post info from the database
+        cursor = mariadb_connection.cursor(buffered=True)
+        cursor.execute(
+            'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = %s',
+            (post_id,))
+        if cursor.rowcount == 0 or cursor.rowcount > 1:
+            abort(404)
+        row = cursor.fetchall()[0]
 
-    type = row[9].upper()
-    picture = row[10]
-    source = row[11]
-    post_date = row[13]
+        type = row[9].upper()
+        picture = row[10]
+        source = row[11]
+        post_date = row[13]
 
-    r = requests.get(api_url + post_id, params=payload)
+        r = requests.get(api_url + post_id, params=payload)
 
-    # retrieve new video or picture url as these expire after some time
-    if type in ['VIDEO', 'PHOTO']:
-        source = r.json().get('source')
-        picture = r.json().get('full_picture')
+        # retrieve new video or picture url as these expire after some time
+        if type in ['VIDEO', 'PHOTO']:
+            source = r.json().get('source')
+            picture = r.json().get('full_picture')
 
-        if source is not None:
-            # fix youtube urls
-            if "youtube" in source:
-                source = source.replace("youtube.com/v/", "youtube.com/embed/")
+            if source is not None:
+                # fix youtube urls
+                if "youtube" in source:
+                    source = source.replace("youtube.com/v/", "youtube.com/embed/")
 
-            # check if url is redirected
-            response = requests.head(source, allow_redirects=True)
-            # url is redirected if history exists
-            if response.history:
-                source = response.url
+                # check if url is redirected
+                response = requests.head(source, allow_redirects=True)
+                # url is redirected if history exists
+                if response.history:
+                    source = response.url
 
-    post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
-            'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
-            'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
-            'owner': row[15], 'id': post_id}
-    cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
-    # add comments
-    post['comments'] = []
-    comments = cursor.fetchall()
+        post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
+                'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
+                'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
+                'owner': row[15], 'id': post_id}
+        cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
+        # add comments
+        post['comments'] = []
+        comments = cursor.fetchall()
 
-    tree = build_tree(comments)
-    sort_tree(tree)
+        tree = build_tree(comments)
+        sort_tree(tree)
 
-    post['comments'] = tree
+        post['comments'] = tree
 
-    post['num_comments'] = len(post['comments'])
-    cursor.execute('SELECT id, name FROM category_name')
-    category_names = cursor.fetchall()
-    # close database connection
-    mariadb_connection.close()
+        post['num_comments'] = len(post['comments'])
+        cursor.execute('SELECT id, name FROM category_name')
+        category_names = cursor.fetchall()
 
-    # reactions became globally active on february the 24th in 2016
-    reactions_available = post_date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
-    work_time = datetime.now()
-    info = {"reactions_available": reactions_available,
-            "work_time": work_time}
+        # reactions became globally active on february the 24th in 2016
+        reactions_available = post_date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
+        work_time = datetime.now()
+        info = {"reactions_available": reactions_available,
+                "work_time": work_time}
 
-    # return post page
-    return render_template('post.html', post=post, category_names=category_names, info=info)
+        # return post page
+        return render_template('post.html', post=post, category_names=category_names, info=info)
+    finally:
+        # close database connection
+        mariadb_connection.close()
 
 
 @app.route('/update', methods=['POST'])
 @auth.login_required
 def update():
-    # Read form from request
-    cat = request.form.get("category", None)
-    succ = request.form.get('success', None)
-    id = request.form["post_id"]
-    duration_seconds = (
-        datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
-    error = 0
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(buffered=True)
 
-    # Build statements
-    stmt = "REPLACE INTO category(user, post_id, category_name_id, successful, duration_seconds) VALUES(%s, %s, %s, %s, %s)"
+        # Read form from request
+        cat = request.form.get("category", None)
+        succ = request.form.get('success', None)
+        id = request.form["post_id"]
+        duration_seconds = (
+            datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
 
-    # Update Record in Database
-    print('Updating record ' + str(id))
-    connection = get_db_connection()
-    cursor = connection.cursor(buffered=True)
-    cursor.execute(stmt, (auth.username(), id, cat, succ, duration_seconds))
-    connection.commit()
-    connection.close()
+        # Build statements
+        stmt = "REPLACE INTO category(user, post_id, category_name_id, successful, duration_seconds) VALUES(%s, %s, %s, %s, %s)"
 
-    # Return to generate page for a new post
-    return generate()
+        # Update Record in Database
+        print('Updating record ' + str(id))
+        cursor.execute(stmt, (auth.username(), id, cat, succ, duration_seconds))
+        connection.commit()
+
+        # Return to generate page for a new post
+        return generate()
+    finally:
+        # close database connection
+        connection.close()
 
 
 # Private getter to create a connection object
