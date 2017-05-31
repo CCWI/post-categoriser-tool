@@ -121,11 +121,15 @@ def getpost(post_id):
                 if "youtube" in source:
                     source = source.replace("youtube.com/v/", "youtube.com/embed/")
 
-                # check if url is redirected
-                response = requests.head(source, allow_redirects=True)
-                # url is redirected if history exists
-                if response.history:
-                    source = response.url
+                try:
+                    # check if url is redirected
+                    response = requests.head(source, allow_redirects=True)
+
+                    # url is redirected if history exists
+                    if response.history:
+                        source = response.url
+                except:
+                    print("Error while looking for redirects.")
 
         post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
                 'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
