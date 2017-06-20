@@ -43,7 +43,7 @@ def main():
         mariadb_connection = get_db_connection()
         cursor = mariadb_connection.cursor(buffered=True)
         cursor.execute(
-            'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id)')
+            'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id) WHERE c.user IS NULL OR c.user NOT IN ("ben","max")')
         if cursor.rowcount != 0:
             row = cursor.fetchone()
             total = row[0]
