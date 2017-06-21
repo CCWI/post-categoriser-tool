@@ -30,7 +30,8 @@
                         <div class="row panel-title">
                             <div class="col col-xs-8">
                                 {% if post.name is not none %}
-                                    <a style="color:white;" href="{{ post.perm_link }}" target="_blank"><p>{{ post.name }}</p></a>
+                                    <a style="color:white;" href="{{ post.perm_link }}" target="_blank">
+                                        <p>{{ post.name }}</p></a>
                                 {% endif %}
                             </div>
                             <div class="col col-xs-4">
@@ -226,6 +227,15 @@
             <div class="form-group row">
                 <div class="col col-lg-12">
                     <button type="submit" class="btn btn-primary btn-block">Speichern und weiter</button>
+                </div>
+            </div>
+        </form>
+        <form action="{{ url_for('skip') }}" method="POST" id="inputform2">
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <input type="hidden" name="work_time" value="{{ info.work_time }}">
+            <div class="form-group row">
+                <div class="col col-lg-12">
+                    <button type="submit" class="btn btn-warning btn-block">Überspringen und weiter</button>
                 </div>
             </div>
         </form>

@@ -191,6 +191,33 @@ def update():
         connection.close()
 
 
+@app.route('/skip', methods=['POST'])
+@auth.login_required
+def skip():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(buffered=True)
+
+        # Read form from request
+        id = request.form["post_id"]
+        duration_seconds = (
+            datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
+
+        # Build statements
+        stmt = "REPLACE INTO skip(user, post_id, duration_seconds) VALUES(%s, %s, %s)"
+
+        # Update Record in Database
+        print('Skipping post ' + str(id))
+        cursor.execute(stmt, (auth.username(), id, duration_seconds))
+        connection.commit()
+
+        # Return to generate page for a new post
+        return generate()
+    finally:
+        # close database connection
+        connection.close()
+
+
 # Private getter to create a connection object
 def get_db_connection():
     return mariadb.connect(host=db_host, port=db_port, user=db_user, password=db_password,
