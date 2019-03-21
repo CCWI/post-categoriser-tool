@@ -5,7 +5,6 @@ from random import randint
 import mysql.connector as mariadb
 import requests
 from datetime import datetime
-from flask import Flask, render_template
 from flask import Flask, render_template, flash, abort
 from flask import redirect
 from flask import request
