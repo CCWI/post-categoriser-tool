@@ -169,18 +169,23 @@ def update():
         cursor = connection.cursor(buffered=True)
 
         # Read form from request
-        cat = request.form.get("category", None)
+        cat = request.form.getlist("category", None)
         succ = request.form.get('success', None)
         id = request.form["post_id"]
         duration_seconds = (
             datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
 
         # Build statements
-        stmt = "REPLACE INTO category(user, post_id, category_name_id, successful, duration_seconds) VALUES(%s, %s, %s, %s, %s)"
+        stmt = "REPLACE INTO category(user, post_id, successful, duration_seconds) VALUES(%s, %s, %s, %s)"
+        stmt2 = "DELETE FROM category_has_category_name WHERE user = %s AND post_id = %s"
+        stmt3 = "INSERT INTO category_has_category_name(user, post_id, category_name_id) VALUES(%s, %s, %s)"
 
         # Update Record in Database
         print('Updating record ' + str(id))
-        cursor.execute(stmt, (auth.username(), id, cat, succ, duration_seconds))
+        cursor.execute(stmt, (auth.username(), id, succ, duration_seconds))
+        cursor.execute(stmt2, (auth.username(), id))
+        for category_id in cat:
+            cursor.execute(stmt3, (auth.username(), id, category_id))
         connection.commit()
 
         # Return to generate page for a new post
