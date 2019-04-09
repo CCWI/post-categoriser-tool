@@ -28,10 +28,10 @@
                 (Link, Video etc.)?</p>
             <div class="row">
                 <div class="col col-xs-5 col-md-4">
-                    <a class="btn btn-primary btn-lg btn-block" href="/generate" role="button">Start</a>
+                    <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('generate', phase_id=0) }}" role="button">Start</a>
                 </div>
                 <div class="col col-xs-5 col-md-4 pull-right">
-                    <a class="btn btn-primary btn-lg btn-block" href="/help" role="button">Hilfe</a>
+                    <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('help') }}" role="button">Hilfe</a>
                 </div>
             </div>
         </div>

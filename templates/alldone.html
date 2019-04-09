@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>All Done</title>
-</head>
-<body>
-<p>Alles fertig! No more Post need to be categorised.</p>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Facebook Post Categoriser</h1>
+            {% if phase_id > 0%}
+                <p>In der Phase {{ phase_id }} wurden alle Beiträge kategorisiert!</p>
+            {% else %}
+                <p>Es sind keine weiteren Beiträge zu kategorisieren.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

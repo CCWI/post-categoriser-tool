@@ -18,7 +18,7 @@ app = Flask(__name__)
 auth = HTTPBasicAuth()
 app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
 
-api_url = 'https://graph.facebook.com/v2.9/'
+api_url = 'https://graph.facebook.com/v3.2/'
 api_access_token_name = 'access_token'
 api_post_field_name = 'fields'
 api_post_field_value = 'source,full_picture'
@@ -63,33 +63,34 @@ def help():
     return render_template('help.html')
 
 
-@app.route('/generate')
-def generate():
+@app.route('/generate/<phase_id>')
+def generate(phase_id):
     try:
         mariadb_connection = get_db_connection()
         cursor = mariadb_connection.cursor(buffered=True)
-        random = randint(1, 10)
 
-        if random == 1:
-            cursor.execute('SELECT post_id FROM category WHERE post_id NOT IN (SELECT post_id FROM category ' +
-                           'WHERE user = "' + auth.username() + '")' +
-                           'GROUP BY post_id ORDER BY count(post_id) ASC, rand() LIMIT 1')
-        if random != 1 or cursor.rowcount == 0:
+        if int(phase_id) > 0:
+            cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id FROM category ' +
+                           'WHERE user = "' + auth.username() + '") ' +
+                           'AND id IN (SELECT post_id FROM post_has_phase ' +
+                           'WHERE phase_id = "' + str(phase_id) + '") ' +
+                           'ORDER BY rand() LIMIT 1')
+        else:
             cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) ORDER BY rand() LIMIT 1')
 
         if cursor.rowcount == 0:
-            return render_template('alldone.html')
+            return render_template('alldone.html', phase_id=int(phase_id))
         else:
             rows = cursor.fetchone()
             post_id = rows[0]
-            return redirect(url_for('getpost', post_id=post_id))
+            return redirect(url_for('getpost', phase_id=int(phase_id), post_id=post_id))
     finally:
         # close database connection
         mariadb_connection.close()
 
 
-@app.route('/post/<post_id>')
-def getpost(post_id):
+@app.route('/post/<phase_id>/<post_id>')
+def getpost(phase_id, post_id):
     try:
         # open database connection
         mariadb_connection = get_db_connection()
@@ -155,7 +156,7 @@ def getpost(post_id):
                 "work_time": work_time}
 
         # return post page
-        return render_template('post.html', post=post, category_names=category_names, info=info)
+        return render_template('post.html', post=post, category_names=category_names, info=info, phase_id=phase_id)
     finally:
         # close database connection
         mariadb_connection.close()
@@ -172,6 +173,7 @@ def update():
         cat = request.form.getlist("category", None)
         succ = request.form.get('success', None)
         id = request.form["post_id"]
+        phase_id = request.form["phase_id"]
         duration_seconds = (
             datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
 
@@ -189,7 +191,7 @@ def update():
         connection.commit()
 
         # Return to generate page for a new post
-        return generate()
+        return generate(phase_id)
     finally:
         # close database connection
         connection.close()
@@ -229,5 +231,5 @@ def get_db_connection():
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5002))
     app.run(host='0.0.0.0', port=port)  # NOSONAR

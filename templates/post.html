@@ -29,17 +29,22 @@
                     <div class="panel-heading">
                         <div class="row panel-title">
                             <div class="col col-xs-8">
-                                {% if post.name is not none %}
-                                    <a style="color:white;" href="{{ post.perm_link }}" target="_blank">
-                                        <p>{{ post.name }}</p></a>
-                                {% endif %}
+                                <a style="color:white;" href="{{ post.perm_link }}" target="_blank">
+                                        {% if post.name %}
+                                            <p>{{ post.name }}</p>
+                                        {% else %}
+                                            <p>Post</p>
+                                        {% endif %}
+                                    </a>
                             </div>
                             <div class="col col-xs-4">
-            <span class="pull-right"><p> Typ:
-                {% if post.type is not none %}
-                    <strong>{{ post.type }}</strong>
-                {% endif %}
-            </p></span>
+                                <span class="pull-right">
+                                    <p> Typ:
+                                    {% if post.type is not none %}
+                                        <strong>{{ post.type }}</strong>
+                                    {% endif %}
+                                    </p>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -171,6 +176,7 @@
             <div class="panel panel-default">
 
                 <div class="panel-body">
+                    <input type="hidden" name="phase_id" value="{{ phase_id }}">
                     <input type="hidden" name="post_id" value="{{ post.id }}">
                     <input type="hidden" name="work_time" value="{{ info.work_time }}">
                     <div class="row">
