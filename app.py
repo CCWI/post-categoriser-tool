@@ -1,6 +1,5 @@
 import ast
 import os
-from random import randint
 
 import mysql.connector as mariadb
 import requests
@@ -21,7 +20,7 @@ app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
 api_url = 'https://graph.facebook.com/v3.2/'
 api_access_token_name = 'access_token'
 api_post_field_name = 'fields'
-api_post_field_value = 'source,full_picture'
+api_post_field_value = 'source,full_picture,link'
 
 payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
@@ -76,7 +75,7 @@ def generate(phase_id):
                            'WHERE phase_id = "' + str(phase_id) + '") ' +
                            'ORDER BY rand() LIMIT 1')
         else:
-            cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) ORDER BY rand() LIMIT 1')
+            cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) AND id IN (SELECT id FROM post_comments) ORDER BY rand() LIMIT 1')
 
         if cursor.rowcount == 0:
             return render_template('alldone.html', phase_id=int(phase_id))
@@ -108,11 +107,12 @@ def getpost(phase_id, post_id):
         picture = row[10]
         source = row[11]
         post_date = row[13]
+        link = None
 
         r = requests.get(api_url + post_id, params=payload)
 
         # retrieve new video or picture url as these expire after some time
-        if type in ['VIDEO', 'PHOTO']:
+        if type in ['VIDEO', 'PHOTO', 'LINK']:
             source = r.json().get('source')
             picture = r.json().get('full_picture')
 
@@ -130,11 +130,13 @@ def getpost(phase_id, post_id):
                         source = response.url
                 except:
                     print("Error while looking for redirects.")
+        if type in ['LINK']:
+            link = r.json().get('link')
 
         post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
                 'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
                 'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
-                'owner': row[15], 'id': post_id}
+                'owner': row[15], 'id': post_id, 'link': link}
         cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
         # add comments
         post['comments'] = []

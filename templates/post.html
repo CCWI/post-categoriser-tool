@@ -76,7 +76,19 @@
                                 </div>
                                 <div class="col col-sm-8">
                                     <p>{{ post.text }}</p>
-                                    <p><b>Video zum Beitrag nicht mehr verfügbar!</b></p>
+                                    <a href="{{ post.perm_link }}" target="_blank">
+                                        <b>Video zum Beitrag bitte auf Facebook ansehen!</b>
+                                    </a>
+                                </div>
+                            {% elif post.type == "LINK" and post.link is not none %}
+                                <div class="col col-sm-4 bottom-buffer ">
+                                    <img width="100%" src="{{ post.picture }}">
+                                </div>
+                                <div class="col col-sm-8">
+                                    <p>{{ post.text }}</p>
+                                    <a href="{{ post.link }}" target="_blank">
+                                        <b>Zum Link</b>
+                                    </a>
                                 </div>
                             {% else %}
                                 <div class="col col-md-12">
