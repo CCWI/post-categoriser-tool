@@ -11,13 +11,13 @@ from flask import url_for
 from flask_httpauth import HTTPBasicAuth
 from tree import build_tree, sort_tree
 
-from config import db_host, db_port, db_user, db_password, db_name, users, api_access_token_value
+from config import db_host, db_port, db_user, db_password, db_name, users, api_access_token_value, secret_key, api_version
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
-app.secret_key = 'I4GAOnCxM3G9gCV0op9KW926L36y5evk'
+app.secret_key = secret_key
 
-api_url = 'https://graph.facebook.com/v3.2/'
+api_url = 'https://graph.facebook.com/{}/'.format(api_version)
 api_access_token_name = 'access_token'
 api_post_field_name = 'fields'
 api_post_field_value = 'source,full_picture,link'
@@ -62,7 +62,7 @@ def help():
     return render_template('help.html')
 
 
-@app.route('/generate/<phase_id>')
+@app.route('/phase/<phase_id>/generate')
 def generate(phase_id):
     try:
         mariadb_connection = get_db_connection()
@@ -70,10 +70,10 @@ def generate(phase_id):
 
         if int(phase_id) > 0:
             cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id FROM category ' +
-                           'WHERE user = "' + auth.username() + '") ' +
+                           'WHERE user = %s) ' +
                            'AND id IN (SELECT post_id FROM post_has_phase ' +
-                           'WHERE phase_id = "' + str(phase_id) + '") ' +
-                           'ORDER BY rand() LIMIT 1')
+                           'WHERE phase_id = %s) ' +
+                           'ORDER BY rand() LIMIT 1', (auth.username(), str(phase_id)))
         else:
             cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) AND id IN (SELECT id FROM post_comments) ORDER BY rand() LIMIT 1')
 
@@ -88,7 +88,7 @@ def generate(phase_id):
         mariadb_connection.close()
 
 
-@app.route('/post/<phase_id>/<post_id>')
+@app.route('/phase/<phase_id>/post/<post_id>')
 def getpost(phase_id, post_id):
     try:
         # open database connection
@@ -137,7 +137,7 @@ def getpost(phase_id, post_id):
                 'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
                 'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
                 'owner': row[15], 'id': post_id, 'link': link}
-        cursor.execute('SELECT text, id, parent_id, date from comment where post_id ="' + post_id + '"')
+        cursor.execute('SELECT text, id, parent_id, date from comment where post_id = %s', (post_id,))
         # add comments
         post['comments'] = []
         comments = cursor.fetchall()
@@ -233,5 +233,5 @@ def get_db_connection():
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5002))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)  # NOSONAR

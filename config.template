@@ -10,3 +10,5 @@ users = {
 }
 # facebook graph api token
 api_access_token_value = ""
+secret_key = 'changeme'
+api_version = 'v3.2'
