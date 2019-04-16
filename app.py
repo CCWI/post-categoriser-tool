@@ -57,6 +57,41 @@ def main():
         mariadb_connection.close()
 
 
+@app.route('/statistics')
+@auth.login_required
+def statistics():
+    total = 0
+    current = 0
+    percent = 0
+    current_user = 0
+    try:
+        mariadb_connection = get_db_connection()
+        cursor = mariadb_connection.cursor(buffered=True)
+        cursor.execute(
+            'SELECT count(distinct p.id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.id)*100,2) FROM post p LEFT JOIN category c on (p.id = c.post_id) WHERE c.user IS NULL OR c.user NOT IN ("ben","max")')
+        if cursor.rowcount != 0:
+            row = cursor.fetchone()
+            total = row[0]
+            current = row[1]
+            percent = row[2]
+
+        cursor.execute(
+            'SELECT count(distinct c.post_id) FROM post p LEFT JOIN category c on (p.id = c.post_id) WHERE c.user = %s', (auth.username(),))
+        if cursor.rowcount != 0:
+            row = cursor.fetchone()
+            current_user = row[0]
+
+        statistic = {"total": total,
+                     "current": current,
+                     "percent": percent,
+                     "current_user": current_user,
+                     "username": auth.username()}
+        return render_template('statistics.html', statistic=statistic)
+    finally:
+        # close database connection
+        mariadb_connection.close()
+
+
 @app.route('/help')
 def help():
     return render_template('help.html')
