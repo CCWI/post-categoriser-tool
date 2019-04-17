@@ -98,22 +98,36 @@ def help():
 
 
 @app.route('/phase/<phase_id>/generate')
+@auth.login_required
 def generate(phase_id):
     try:
         mariadb_connection = get_db_connection()
         cursor = mariadb_connection.cursor(buffered=True)
 
-        if int(phase_id) > 0:
+        if int(phase_id) == 0:
+            cursor.execute('SELECT post_id FROM post_has_phase WHERE phase_id = 0 AND post_id '
+                           'NOT IN (SELECT post_id FROM category) AND '
+                           'NOT EXISTS (SELECT post_id FROM post_has_phase '
+                           'WHERE phase_id = 2 AND post_id '
+                           'NOT IN (SELECT post_id FROM category WHERE user = %s)) ORDER BY rand() LIMIT 1',
+                           (auth.username(),))
+        else:
             cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id FROM category ' +
                            'WHERE user = %s) ' +
                            'AND id IN (SELECT post_id FROM post_has_phase ' +
                            'WHERE phase_id = %s) ' +
                            'ORDER BY rand() LIMIT 1', (auth.username(), str(phase_id)))
-        else:
-            cursor.execute('SELECT id FROM post WHERE id NOT IN (SELECT post_id from category) AND id IN (SELECT id FROM post_comments) ORDER BY rand() LIMIT 1')
 
         if cursor.rowcount == 0:
-            return render_template('alldone.html', phase_id=int(phase_id))
+            if int(phase_id) == 0:
+                # to begin with phase 3, the user has to has no incomplete posts in phase 2
+                cursor.execute('SELECT post_id FROM post_has_phase WHERE phase_id = %s '
+                               'AND post_id NOT IN '
+                               '(SELECT post_id FROM category WHERE user = %s);', (str(2), auth.username()))
+                if cursor.rowcount > 0:
+                    return render_template('incomplete.html', phase=int(3), last_phase=int(2))
+            else:
+                return render_template('alldone.html', phase_id=int(phase_id))
         else:
             rows = cursor.fetchone()
             post_id = rows[0]
@@ -124,6 +138,7 @@ def generate(phase_id):
 
 
 @app.route('/phase/<phase_id>/post/<post_id>')
+@auth.login_required
 def getpost(phase_id, post_id):
     try:
         # open database connection
