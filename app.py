@@ -260,6 +260,7 @@ def skip():
 
         # Read form from request
         id = request.form["post_id"]
+        phase_id = request.form["phase_id"]
         duration_seconds = (
             datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
 
@@ -272,7 +273,7 @@ def skip():
         connection.commit()
 
         # Return to generate page for a new post
-        return generate()
+        return generate(phase_id)
     finally:
         # close database connection
         connection.close()
