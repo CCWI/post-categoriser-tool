@@ -8,7 +8,5 @@ users = {
     "user1": "password1",
     "user2": "password2"
 }
-# facebook graph api token
-api_access_token_value = ""
+# secret key for encryption
 secret_key = 'changeme'
-api_version = 'v3.2'

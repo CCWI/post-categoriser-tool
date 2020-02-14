@@ -1,5 +1,6 @@
 import ast
 import os
+import logging
 
 import mysql.connector as mariadb
 import requests
@@ -9,20 +10,14 @@ from flask import redirect
 from flask import request
 from flask import url_for
 from flask_httpauth import HTTPBasicAuth
+from flask import Markup
 from tree import build_tree, sort_tree
 
-from config import db_host, db_port, db_user, db_password, db_name, users, api_access_token_value, secret_key, api_version
+from config import db_host, db_port, db_user, db_password, db_name, users, secret_key
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 app.secret_key = secret_key
-
-api_url = 'https://graph.facebook.com/{}/'.format(api_version)
-api_access_token_name = 'access_token'
-api_post_field_name = 'fields'
-api_post_field_value = 'source,full_picture,link'
-
-payload = {api_access_token_name: api_access_token_value, api_post_field_name: api_post_field_value}
 
 query_posts_classified = 'SELECT count(distinct p.post_id), count(distinct c.post_id), round(count(distinct c.post_id)/count(distinct p.post_id)*100,2) FROM post_has_phase p LEFT JOIN category c on (p.post_id = c.post_id) WHERE c.user IS NULL OR c.user NOT IN ("ben","max")'
 
@@ -128,6 +123,9 @@ def generate(phase_id):
                                '(SELECT post_id FROM category WHERE user = %s);', (str(2), auth.username()))
                 if cursor.rowcount > 0:
                     return render_template('incomplete.html', phase=int(3), last_phase=int(2))
+                # there are no more posts of phase 3
+                else:
+                    return render_template('alldone.html', phase_id=int(phase_id))
             else:
                 return render_template('alldone.html', phase_id=int(phase_id))
         else:
@@ -149,65 +147,30 @@ def getpost(phase_id, post_id):
         # get post info from the database
         cursor = mariadb_connection.cursor(buffered=True)
         cursor.execute(
-            'SELECT p.text,p.num_likes,p.num_shares,p.num_angry,p.num_haha,p.num_wow,p.num_love,p.num_sad,p.name,p.type,p.picture,p.source,p.permanent_link,p.date,p.paid,pg.owner FROM post p JOIN page pg ON (p.page_id = pg.id) WHERE p.id = %s',
+            'SELECT p.id, p.text FROM post p WHERE p.id = %s',
             (post_id,))
         if cursor.rowcount == 0 or cursor.rowcount > 1:
             abort(404)
         row = cursor.fetchall()[0]
 
-        type = row[9].upper()
-        picture = row[10]
-        source = row[11]
-        post_date = row[13]
-        link = None
+        post_id_db = row[0]
+        text = row[1]
 
-        r = requests.get(api_url + post_id, params=payload)
+        post_url = 'https://twitter.com/anyuser/statuses/' + post_id
+        # dnt = do not track
+        payload = {'url': post_url, 'lang': 'en', 'dnt': 'true'}
+        r = requests.get('https://publish.twitter.com/oembed', params=payload)
 
-        # retrieve new video or picture url as these expire after some time
-        if type in ['VIDEO', 'PHOTO', 'LINK']:
-            source = r.json().get('source')
-            picture = r.json().get('full_picture')
+        embed_tweet_html = Markup(r.json().get('html'))
 
-            if source is not None:
-                # fix youtube urls
-                if "youtube" in source:
-                    source = source.replace("youtube.com/v/", "youtube.com/embed/")
+        post = {'text': text, 'id': post_id, 'embed_tweet_html': embed_tweet_html}
 
-                try:
-                    # check if url is redirected
-                    response = requests.head(source, allow_redirects=True)
-
-                    # url is redirected if history exists
-                    if response.history:
-                        source = response.url
-                except:
-                    print("Error while looking for redirects.")
-        if type in ['LINK']:
-            link = r.json().get('link')
-
-        post = {'text': row[0], 'num_likes': row[1], 'num_shares': row[2], 'num_angry': row[3], 'num_haha': row[4],
-                'num_wow': row[5], 'num_love': row[6], 'num_sad': row[7], 'name': row[8], 'type': type,
-                'picture': picture, 'source': source, 'perm_link': row[12], 'date': post_date, 'paid': row[14],
-                'owner': row[15], 'id': post_id, 'link': link}
-        cursor.execute('SELECT text, id, parent_id, date from comment where post_id = %s', (post_id,))
-        # add comments
-        post['comments'] = []
-        comments = cursor.fetchall()
-
-        tree = build_tree(comments)
-        sort_tree(tree)
-
-        post['comments'] = tree
-
-        post['num_comments'] = len(post['comments'])
+        # fetch category names
         cursor.execute('SELECT id, name FROM category_name')
         category_names = cursor.fetchall()
 
-        # reactions became globally active on february the 24th in 2016
-        reactions_available = post_date >= datetime.strptime('2016-02-24', "%Y-%m-%d")
         work_time = datetime.now()
-        info = {"reactions_available": reactions_available,
-                "work_time": work_time}
+        info = {"work_time": work_time}
 
         # return post page
         return render_template('post.html', post=post, category_names=category_names, info=info, phase_id=phase_id)
@@ -225,20 +188,19 @@ def update():
 
         # Read form from request
         cat = request.form.getlist("category", None)
-        succ = request.form.get('success', None)
         id = request.form["post_id"]
         phase_id = request.form["phase_id"]
         duration_seconds = (
             datetime.now() - datetime.strptime(request.form["work_time"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
 
         # Build statements
-        stmt = "REPLACE INTO category(user, post_id, successful, duration_seconds) VALUES(%s, %s, %s, %s)"
+        stmt = "REPLACE INTO category(user, post_id, duration_seconds) VALUES(%s, %s, %s)"
         stmt2 = "DELETE FROM category_has_category_name WHERE user = %s AND post_id = %s"
         stmt3 = "INSERT INTO category_has_category_name(user, post_id, category_name_id) VALUES(%s, %s, %s)"
 
         # Update Record in Database
-        print('Updating record ' + str(id))
-        cursor.execute(stmt, (auth.username(), id, succ, duration_seconds))
+        logging.debug('Updating record ' + str(id))
+        cursor.execute(stmt, (auth.username(), id, duration_seconds))
         cursor.execute(stmt2, (auth.username(), id))
         for category_id in cat:
             cursor.execute(stmt3, (auth.username(), id, category_id))
